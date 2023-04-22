@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name="Hermes BS",
-    version="1.0.0",
+    version="1.1.0",
     py_modules=["controler", "model", "template"],
     author="Simon Bierozko",
     author_email="simon1494@hotmail.com",
