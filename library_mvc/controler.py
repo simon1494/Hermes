@@ -1,9 +1,7 @@
 import tkinter as tk
-import template
-import model
+from template import App
 
 if __name__ == "__main__":
     root = tk.Tk()
-    model.create_db()
-    template.App(root)
+    App(root)
     root.mainloop()

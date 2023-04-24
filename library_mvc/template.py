@@ -1,11 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
-import model
+from model import Functions
+
 
 #:::::::::::::::Seteo general de la self.ventana. Creación y posicionamiento de widgets::::::::::::
-class App:
+class App(Functions):
     def __init__(self, win):
+
+        self.create_db()
+
         self.mensaje_error = (
             "\n\n"
             + "Tenga en cuenta:"
@@ -28,7 +32,7 @@ class App:
         self.ventana = win
         self.ventana.title("Hermes BookSearch 1.0")
         self.ventana.config(bg="#091430")
-        self.ventana.geometry(model.__center_window__(self.ventana, 700, 750))
+        self.ventana.geometry(self.__center_window__(self.ventana, 700, 750))
 
         #::::::::::::::Variables de control para la manipulación de los campos de Data Entry::::::::::
 
@@ -54,12 +58,22 @@ class App:
         #:::::::::::::::::::::::::::::Etiquetas de los campos de Data Entry:::::::::::::::::::::::::::
 
         self.fuente = Font(family="Consolas", size=12, weight="bold")
+        self.fuente1 = Font(family="Consolas", size=9, weight="bold")
+
         self.s = ttk.Style(self.ventana)
         self.s.configure("TLabel", background="#091430", foreground="white")
 
         self.lb_id = ttk.Label(
             self.ventana, text="ID", anchor=tk.E, style="TLabel", font=self.fuente
         )
+        self.lb_id_info = ttk.Label(
+            self.ventana,
+            text="(Usar solo para Eliminar, Modificar o Consultar)",
+            anchor=tk.W,
+            style="TLabel",
+            font=self.fuente1,
+        )
+
         self.lb_nombre = ttk.Label(
             self.ventana, text="Nombre", anchor=tk.E, style="TLabel", font=self.fuente
         )
@@ -92,6 +106,7 @@ class App:
         )
 
         self.lb_id.place(x=82, y=28, width=103, height=30)
+        self.lb_id_info.place(x=310, y=28, width=400, height=30)
         self.lb_nombre.place(x=82, y=73, width=103, height=30)
         self.lb_autor.place(x=82, y=118, width=103, height=30)
         self.lb_editorial.place(x=82, y=163, width=103, height=30)
@@ -105,7 +120,7 @@ class App:
         self.box_id = tk.Entry(
             self.ventana,
             textvariable=self.control_id,
-            bg="#A5FFCE",
+            bg="#FAC921",
             font=("Consolas 11"),
         )
         self.box_nombre = tk.Entry(
@@ -172,10 +187,10 @@ class App:
         self.bt_agregar = tk.Button(
             self.ventana,
             text="Añadir",
-            background="#02FF3A",
+            background="#22DB68",
             activebackground="#751C3C",
             font=("Consolas 12 bold"),
-            command=lambda: model.agregar_libro(
+            command=lambda: self.agregar_libro(
                 self.control_id,
                 self.control_nombre,
                 self.control_autor,
@@ -190,10 +205,10 @@ class App:
         self.bt_eliminar = tk.Button(
             self.ventana,
             text="Eliminar",
-            background="#02FF3A",
+            background="#FAC921",
             activebackground="#751C3C",
             font=("Consolas 12 bold"),
-            command=lambda: model.eliminar_libro(
+            command=lambda: self.eliminar_libro(
                 self.control_id,
                 self.control_nombre,
                 self.control_autor,
@@ -208,10 +223,10 @@ class App:
         self.bt_modificar = tk.Button(
             self.ventana,
             text="Modificar",
-            background="#02FF3A",
+            background="#FAC921",
             activebackground="#751C3C",
             font=("Consolas 12 bold"),
-            command=lambda: model.modificar_libro(
+            command=lambda: self.modificar_libro(
                 self.control_id,
                 self.control_nombre,
                 self.control_autor,
@@ -226,10 +241,10 @@ class App:
         self.bt_consultar = tk.Button(
             self.ventana,
             text="Consultar",
-            background="#02FF3A",
+            background="#FAC921",
             activebackground="#751C3C",
             font=("Consolas 12 bold"),
-            command=lambda: model.consultar(
+            command=lambda: self.consultar(
                 self.control_consulta,
                 self.control_id,
                 self.control_nombre,
@@ -268,7 +283,7 @@ class App:
         self.tree.column("estado", minwidth=0, width=110, anchor="center")
         self.tree.bind(
             "<ButtonRelease-1>",
-            lambda evento: model.select_item(
+            lambda evento: self.select_item(
                 a=self.tree,
                 b=self.control_id,
                 c=self.control_nombre,
@@ -280,4 +295,4 @@ class App:
             ),
         )
 
-        model.__built__(self.tree)
+        self.__built__(self.tree)

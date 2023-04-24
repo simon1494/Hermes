@@ -1,8 +1,0 @@
-controler.py
-model.py
-setup.py
-template.py
-Hermes_BS.egg-info/PKG-INFO
-Hermes_BS.egg-info/SOURCES.txt
-Hermes_BS.egg-info/dependency_links.txt
-Hermes_BS.egg-info/top_level.txt
