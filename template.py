@@ -1,13 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
-from model import Functions
+from model import Database
+from model import Apoyo
 
 
 #:::::::::::::::Seteo general de la self.ventana. Creación y posicionamiento de widgets::::::::::::
-class App(Functions):
+class App(Apoyo):
     def __init__(self, win):
-
         self.create_db()
 
         self.mensaje_error = (
@@ -32,7 +32,7 @@ class App(Functions):
         self.ventana = win
         self.ventana.title("Hermes BookSearch 1.0")
         self.ventana.config(bg="#091430")
-        self.ventana.geometry(self.__center_window__(self.ventana, 700, 750))
+        self.ventana.geometry(self.center_window(self.ventana, 700, 750))
 
         #::::::::::::::Variables de control para la manipulación de los campos de Data Entry::::::::::
 
@@ -295,4 +295,4 @@ class App(Functions):
             ),
         )
 
-        self.__built__(self.tree)
+        self._built(self.tree)

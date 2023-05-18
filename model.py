@@ -2,13 +2,34 @@ import pandas as pd
 import sqlite3
 import re
 from tkinter.messagebox import *
+from peewee import *
+
+db = SqliteDatabase("biblioteca.db")
 
 
-class Functions:
+class BaseModel(Model):
+    class Meta:
+        database = db
+
+
+class Libro(BaseModel):
+    id = PrimaryKeyField()
+    nombre = TextField()
+    autor = TextField()
+    editorial = TextField()
+    año = TimeField()
+    categoria = TextField()
+    estado = TextField()
+
+    class Meta:
+        table_name = "libros"
+
+
+class Database:
     # Comprueba si existe una base de datos y, en caso de no existir, la crea.
-    @staticmethod
-    def create_db():
-        conn = sqlite3.connect("biblioteca")
+
+    def create_db(self):
+        conn = sqlite3.connect("biblioteca.db")
         c = conn.cursor()
 
         c.execute(
@@ -27,53 +48,40 @@ class Functions:
 
     # Envía una consulta INSERT a la DB con los datos ingresados por el usuario.
     def insert_item(self, nombre, autor, editorial, año, categoria, estado):
-        conn = sqlite3.connect("biblioteca")
-        c = conn.cursor()
-
-        c.execute(
-            f"""
-                    INSERT INTO libros 
-                    (nombre, autor, editorial, año, categoria, estado) 
-                    VALUES ("{nombre}", "{autor}", "{editorial}", 
-                    "{año}", "{categoria}", "{estado}")
-                    """
-        )
-        conn.commit()
+        libro = Libro()
+        libro.nombre = nombre
+        libro.autor = autor
+        libro.editorial = editorial
+        libro.año = año
+        libro.categoria = categoria
+        libro.estado = estado
+        libro.save()
 
     # Envía una consulta DELETE a la DB con el id del item facilitado por el usuario.
     def delete_item(self, id):
-        conn = sqlite3.connect("biblioteca")
-        c = conn.cursor()
-
-        c.execute(
-            f"""
-                        DELETE FROM libros
-                        WHERE id={id}
-                        """
-        )
-        conn.commit()
+        registro = Libro.get(Libro.id == id)
+        registro.delete_instance()
 
     # Envía una consulta UPDATE a la DB con el id del item facilitado y realiza una
     # actualización general de los datos.
-    def update_item(self, id, nombre, autor, editorial, año, categoria, estado):
-        conn = sqlite3.connect("biblioteca")
-        c = conn.cursor()
 
-        c.execute(
-            f"""
-                UPDATE libros 
-                SET nombre = "{nombre}", autor = "{autor}", 
-                editorial = "{editorial}", año = "{año}", 
-                categoria = "{categoria}", estado = "{estado}" WHERE id = {id}
-            """
-        )
-        conn.commit()
+    def update_item(self, id, nombre, autor, editorial, año, categoria, estado):
+        registro = Libro.update(
+            nombre=nombre,
+            autor=autor,
+            editorial=editorial,
+            año=año,
+            categoria=categoria,
+            estado=estado,
+        ).where(Libro.id == id)
+        registro.execute()
 
     # Envía una consulta SELECT a la DB y retorna el resultado en formato Dataframe.
     # La cláusula WHERE (argumento 'x') puede ser suministrada por el usuario según
     # su elección.
+
     def myquery(self, x=""):
-        conn = sqlite3.connect("biblioteca")
+        conn = sqlite3.connect("biblioteca.db")
         c = conn.cursor()
 
         c.execute(
@@ -98,11 +106,13 @@ class Functions:
 
         return query
 
+
+class Apoyo(Database):
     # Ejecuta una acción INSERT sobre la DB al oprimir el botón "Añadir".
     def agregar_libro(
         self, id, nombre, autor, editorial, año, categoria, estado, mensaje_error, tree
     ):
-        if self.__validate_data__(id, nombre, autor, editorial, año, categoria, estado):
+        if self.__validate_data(id, nombre, autor, editorial, año, categoria, estado):
             self.insert_item(
                 nombre.get(),
                 autor.get(),
@@ -112,8 +122,8 @@ class Functions:
                 estado.get(),
             )
             showinfo(title="Aviso", message="Su libro fue cargado correctamente")
-            self.__clearnbuild__(tree)
-            self.__clear_data_entry__(
+            self.__clearnbuild(tree)
+            self.__clear_data_entry(
                 id, nombre, autor, editorial, año, categoria, estado
             )
         else:
@@ -136,8 +146,8 @@ class Functions:
             if answer:
                 self.delete_item(id.get())
                 showinfo(title="Aviso", message="Su libro fue eliminado correctamente")
-                self.__clearnbuild__(tree)
-                self.__clear_data_entry__(
+                self.__clearnbuild(tree)
+                self.__clear_data_entry(
                     id, nombre, autor, editorial, año, categoria, estado
                 )
         else:
@@ -151,7 +161,7 @@ class Functions:
     def modificar_libro(
         self, id, nombre, autor, editorial, año, categoria, estado, mensaje_error, tree
     ):
-        if self.__validate_data__(id, nombre, autor, editorial, año, categoria, estado):
+        if self.__validate_data(id, nombre, autor, editorial, año, categoria, estado):
             answer = askyesno(
                 title="Confirmación",
                 message="¿Realmente desea modificar este libro?",
@@ -167,8 +177,8 @@ class Functions:
                     estado.get(),
                 )
                 showinfo(title="Aviso", message="Su libro fue modificado correctamente")
-                self.__clearnbuild__(tree)
-                self.__clear_data_entry__(
+                self.__clearnbuild(tree)
+                self.__clear_data_entry(
                     id, nombre, autor, editorial, año, categoria, estado
                 )
         else:
@@ -193,7 +203,7 @@ class Functions:
         tree,
     ):
         if (
-            self.__query_validation__(
+            self.__query_validation(
                 consulta.get(),
                 id,
                 nombre,
@@ -207,7 +217,7 @@ class Functions:
             )
             != None
         ):
-            query = self.__query_validation__(
+            query = self.__query_validation(
                 consulta.get(),
                 id,
                 nombre,
@@ -219,8 +229,8 @@ class Functions:
                 mensaje_error,
                 tree,
             )
-            self.__clear__(tree)
-            self.__built__(tree, x=query)
+            self.__clear(tree)
+            self._built(tree, x=query)
 
     # Autocompleta los campos del Data Entry con los datos del libro# seleccionado
     # por el usuario en el TreeView.
@@ -239,7 +249,7 @@ class Functions:
         selected = self.myquery(
             x="WHERE id = " + str(a.item(item_)["values"][0])
         ).values.tolist()
-        self.__clear_data_entry__(b, c, d, e, f, g, h)
+        self.__clear_data_entry(b, c, d, e, f, g, h)
         b.set(selected[0][0])
         c.set(selected[0][1])
         d.set(selected[0][2])
@@ -249,25 +259,26 @@ class Functions:
         h.set(selected[0][6])
 
     # La función centra la ventana principal a partir de los datos de resolución de pantalla.
-    def __center_window__(self, win, window_width, window_height):
+    @staticmethod
+    def center_window(win, window_width, window_height):
         screen_width = win.winfo_screenwidth()
         screen_height = win.winfo_screenheight()
         center_x = int(screen_width / 2 - window_width / 2)
         center_y = int(screen_height / 2 - window_height / 2)
         return f"{window_width}x{window_height}+{center_x}+{center_y}"
 
-    def __clearnbuild__(self, tree):
-        self.__clear__(tree)
-        self.__built__(tree)
+    def __clearnbuild(self, tree):
+        self.__clear(tree)
+        self._built(tree)
 
     # Vacía el Treeview
-    def __clear__(self, tree):
+    def __clear(self, tree):
         for row in tree.get_children():
             tree.delete(row)
 
     # Construye el TreeView con los datos retornados de una consulta SELECT a DB.
-    def __built__(self, tree, x=""):
-        self.__clear__(tree)
+    def _built(self, tree, x=""):
+        self.__clear(tree)
         data = self.myquery(x).values.tolist()
         for i in range(0, len(data)):
             tree.insert(
@@ -284,7 +295,7 @@ class Functions:
             )
 
     # Vacía todos los datos existentes en los campos de Data Entry.
-    def __clear_data_entry__(
+    def __clear_data_entry(
         self,
         control_id,
         control_nombre,
@@ -304,7 +315,7 @@ class Functions:
 
     # Comprueba la validez de la expresión del campo solicitado en la búsqueda del usuario
     # y retorna una consulta SQL en forma de STR o un mensaje de error en caso contrario.
-    def __query_validation__(
+    def __query_validation(
         self,
         y,
         control_id,
@@ -329,7 +340,7 @@ class Functions:
 
         match y:
             case "Ver todo":
-                self.__clear_data_entry__(
+                self.__clear_data_entry(
                     control_id,
                     control_nombre,
                     control_autor,
@@ -405,7 +416,7 @@ class Functions:
 
     # Comprueba la validez de las expresiones en todos los campos del data entry y retorna
     # True si son todas correctas o False en caso contrario.
-    def __validate_data__(
+    def __validate_data(
         self,
         control_id,
         control_nombre,
