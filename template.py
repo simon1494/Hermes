@@ -1,14 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
-from model import Database
-from model import Apoyo
+from model import Api
 
 
-#:::::::::::::::Seteo general de la self.ventana. Creación y posicionamiento de widgets::::::::::::
-class App(Apoyo):
+class App(Api):
     def __init__(self, win):
-        self.create_db()
+
+        self.crear_db()
 
         self.mensaje_error = (
             "\n\n"
@@ -32,7 +31,7 @@ class App(Apoyo):
         self.ventana = win
         self.ventana.title("Hermes BookSearch 1.0")
         self.ventana.config(bg="#091430")
-        self.ventana.geometry(self.center_window(self.ventana, 700, 750))
+        self.ventana.geometry(self.centrar_ventana(self.ventana, 700, 750))
 
         #::::::::::::::Variables de control para la manipulación de los campos de Data Entry::::::::::
 
@@ -283,7 +282,7 @@ class App(Apoyo):
         self.tree.column("estado", minwidth=0, width=110, anchor="center")
         self.tree.bind(
             "<ButtonRelease-1>",
-            lambda evento: self.select_item(
+            lambda evento: self.seleccionar_item(
                 a=self.tree,
                 b=self.control_id,
                 c=self.control_nombre,
@@ -295,4 +294,4 @@ class App(Apoyo):
             ),
         )
 
-        self._built(self.tree)
+        self.armar_treeview(self.tree)
