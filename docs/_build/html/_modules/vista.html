@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vista &mdash; documentación de Hermes_BookSearch - 1.0.0</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/translations.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Hermes_BookSearch
+          </a>
+              <div class="version">
+                1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../controlador.html">controlador module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modelo.html">modelo module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vista.html">vista module</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Hermes_BookSearch</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Código de módulo</a></li>
+      <li class="breadcrumb-item active">vista</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Código fuente para vista</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">tkinter</span> <span class="k">as</span> <span class="nn">tk</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">ttk</span>
+<span class="kn">from</span> <span class="nn">tkinter.font</span> <span class="kn">import</span> <span class="n">Font</span>
+<span class="kn">from</span> <span class="nn">modelo</span> <span class="kn">import</span> <span class="n">Api</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">VIsta:</span>
+<span class="sd">    Administra la interfaz de nuestra aplicación. </span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="App"><a class="viewcode-back" href="../vista.html#vista.App">[documentos]</a><span class="k">class</span> <span class="nc">App</span><span class="p">(</span><span class="n">Api</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estructura la interfaz gráfica, a la vez que incorpora todas las funcionalidades y lógica interna del programa, así como tambien conexión con la base de datos, al heredar de la clase model.Api</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">win</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mensaje_error</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;Tenga en cuenta:&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;ID: debe ser un número entero&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;Nombre: No debe contener caracteres especiales ni abreviatuas&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;Autor: No debe contener números ni caracteres especiales&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;Editorial: No debe contener carateres especiales&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;Año: Debe ser un numero entero entre 1900 y 2029&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;Categoría: Debe estar entre los items de la lista desplegable&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;Estado: Debe estar entre los items de la lista desplegable&quot;</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span> <span class="o">=</span> <span class="n">win</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Hermes BookSearch 1.0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">bg</span><span class="o">=</span><span class="s2">&quot;#091430&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">centrar_ventana</span><span class="p">(</span><span class="mi">700</span><span class="p">,</span> <span class="mi">750</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crear_db</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crear_variables_control</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crear_labels</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crear_entries</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crear_botones</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crear_treeview</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">armar_treeview</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">)</span>
+
+<div class="viewcode-block" id="App.crear_variables_control"><a class="viewcode-back" href="../vista.html#vista.App.crear_variables_control">[documentos]</a>    <span class="k">def</span> <span class="nf">crear_variables_control</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Crea las variables de control utilizadas para manipular a través de la aplicación la información de los registros.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_id</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_nombre</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_autor</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_editorial</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_año</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_categoria</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_estado</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_consulta</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_id</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_nombre</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_autor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_editorial</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_año</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_categoria</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_estado</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">control_consulta</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="App.crear_labels"><a class="viewcode-back" href="../vista.html#vista.App.crear_labels">[documentos]</a>    <span class="k">def</span> <span class="nf">crear_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Crea las etiquetas de los data entries.&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fuente</span> <span class="o">=</span> <span class="n">Font</span><span class="p">(</span><span class="n">family</span><span class="o">=</span><span class="s2">&quot;Consolas&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fuente1</span> <span class="o">=</span> <span class="n">Font</span><span class="p">(</span><span class="n">family</span><span class="o">=</span><span class="s2">&quot;Consolas&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Style</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">s</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="s2">&quot;TLabel&quot;</span><span class="p">,</span> <span class="n">background</span><span class="o">=</span><span class="s2">&quot;#091430&quot;</span><span class="p">,</span> <span class="n">foreground</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_id</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;ID&quot;</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;TLabel&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fuente</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_id_info</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;(Usar solo para Eliminar, Modificar o Consultar)&quot;</span><span class="p">,</span>
+            <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">W</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="s2">&quot;TLabel&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fuente1</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_nombre</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Nombre&quot;</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;TLabel&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fuente</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_autor</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Autor&quot;</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;TLabel&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fuente</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_editorial</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Editorial&quot;</span><span class="p">,</span>
+            <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">E</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="s2">&quot;TLabel&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fuente</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_año</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Año publicación&quot;</span><span class="p">,</span>
+            <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">E</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="s2">&quot;TLabel&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fuente</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_categoria</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Categoría&quot;</span><span class="p">,</span>
+            <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">E</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="s2">&quot;TLabel&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fuente</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_estado</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Estado&quot;</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">tk</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;TLabel&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fuente</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_id</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">28</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">103</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_id_info</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">310</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">28</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_nombre</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">103</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_autor</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">118</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">103</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_editorial</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">82</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">163</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">103</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_año</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">208</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">167</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_categoria</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">92</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">253</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">93</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lb_estado</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">92</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">93</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="App.crear_entries"><a class="viewcode-back" href="../vista.html#vista.App.crear_entries">[documentos]</a>    <span class="k">def</span> <span class="nf">crear_entries</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Crea los widgets de entrada de texto con los que el usuario interactuará para cargar información&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_id</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">control_id</span><span class="p">,</span>
+            <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;#FAC921&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Consolas 11&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_nombre</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">control_nombre</span><span class="p">,</span>
+            <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;#A5FFCE&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Consolas 11&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_autor</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">control_autor</span><span class="p">,</span>
+            <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;#A5FFCE&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Consolas 11&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_editorial</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">control_editorial</span><span class="p">,</span>
+            <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;#A5FFCE&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Consolas 11&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_año</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Entry</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">control_año</span><span class="p">,</span>
+            <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;#A5FFCE&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Consolas 11&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_categoria</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Combobox</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">control_categoria</span><span class="p">,</span>
+            <span class="n">values</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Ficción&quot;</span><span class="p">,</span> <span class="s2">&quot;Ensayo&quot;</span><span class="p">,</span> <span class="s2">&quot;Poesía&quot;</span><span class="p">,</span> <span class="s2">&quot;Filosofía&quot;</span><span class="p">,</span> <span class="s2">&quot;Sociología&quot;</span><span class="p">,</span> <span class="s2">&quot;Otros&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_estado</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Combobox</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">control_estado</span><span class="p">,</span>
+            <span class="n">values</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;En Biblioteca&quot;</span><span class="p">,</span> <span class="s2">&quot;Prestado&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">box_consulta</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Combobox</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">control_consulta</span><span class="p">,</span>
+            <span class="n">values</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;Ver todo&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Buscar id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Buscar nombre&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Buscar autor&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Buscar editorial&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Buscar año&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Buscar categoria&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Buscar estado&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">state</span><span class="o">=</span><span class="s2">&quot;readonly&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">box_consulta</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">538</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">325</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">136</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_id</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">203</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">28</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_nombre</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">203</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">73</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_autor</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">203</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">118</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">230</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_editorial</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">203</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">163</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">230</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_año</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">203</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">208</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_categoria</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">203</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">253</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">230</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_estado</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">203</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">298</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="App.crear_botones"><a class="viewcode-back" href="../vista.html#vista.App.crear_botones">[documentos]</a>    <span class="k">def</span> <span class="nf">crear_botones</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Crea los botones de nuestra aplicación&quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bt_agregar</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Añadir&quot;</span><span class="p">,</span>
+            <span class="n">background</span><span class="o">=</span><span class="s2">&quot;#22DB68&quot;</span><span class="p">,</span>
+            <span class="n">activebackground</span><span class="o">=</span><span class="s2">&quot;#751C3C&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Consolas 12 bold&quot;</span><span class="p">),</span>
+            <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">agregar_libro</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_id</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_nombre</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_autor</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_editorial</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_año</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_categoria</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_estado</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mensaje_error</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bt_eliminar</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Eliminar&quot;</span><span class="p">,</span>
+            <span class="n">background</span><span class="o">=</span><span class="s2">&quot;#FAC921&quot;</span><span class="p">,</span>
+            <span class="n">activebackground</span><span class="o">=</span><span class="s2">&quot;#751C3C&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Consolas 12 bold&quot;</span><span class="p">),</span>
+            <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">eliminar_libro</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_id</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_nombre</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_autor</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_editorial</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_año</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_categoria</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_estado</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mensaje_error</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bt_modificar</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Modificar&quot;</span><span class="p">,</span>
+            <span class="n">background</span><span class="o">=</span><span class="s2">&quot;#FAC921&quot;</span><span class="p">,</span>
+            <span class="n">activebackground</span><span class="o">=</span><span class="s2">&quot;#751C3C&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Consolas 12 bold&quot;</span><span class="p">),</span>
+            <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">modificar_libro</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_id</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_nombre</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_autor</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_editorial</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_año</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_categoria</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_estado</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mensaje_error</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bt_consultar</span> <span class="o">=</span> <span class="n">tk</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Consultar&quot;</span><span class="p">,</span>
+            <span class="n">background</span><span class="o">=</span><span class="s2">&quot;#FAC921&quot;</span><span class="p">,</span>
+            <span class="n">activebackground</span><span class="o">=</span><span class="s2">&quot;#751C3C&quot;</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;Consolas 12 bold&quot;</span><span class="p">),</span>
+            <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">consultar</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_consulta</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_id</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_nombre</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_autor</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_editorial</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_año</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_categoria</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_estado</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mensaje_error</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bt_agregar</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">370</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">136</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">36</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bt_eliminar</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">196</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">370</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">136</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">36</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bt_modificar</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">367</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">370</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">136</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">36</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bt_consultar</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">538</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">370</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">136</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">36</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="App.crear_treeview"><a class="viewcode-back" href="../vista.html#vista.App.crear_treeview">[documentos]</a>    <span class="k">def</span> <span class="nf">crear_treeview</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Crea el Treeview de nuestra aplicación&quot;&quot;&quot;</span>
+
+        <span class="n">columnas</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;nombre&quot;</span><span class="p">,</span> <span class="s2">&quot;autor&quot;</span><span class="p">,</span> <span class="s2">&quot;editorial&quot;</span><span class="p">,</span> <span class="s2">&quot;categoria&quot;</span><span class="p">,</span> <span class="s2">&quot;estado&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span> <span class="o">=</span> <span class="n">ttk</span><span class="o">.</span><span class="n">Treeview</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ventana</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columnas</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">heading</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">heading</span><span class="p">(</span><span class="s2">&quot;nombre&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Nombre&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">heading</span><span class="p">(</span><span class="s2">&quot;autor&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Autor&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">heading</span><span class="p">(</span><span class="s2">&quot;editorial&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Editorial&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">heading</span><span class="p">(</span><span class="s2">&quot;categoria&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Categoría&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">heading</span><span class="p">(</span><span class="s2">&quot;estado&quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Estado&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">427</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">660</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="s2">&quot;#0&quot;</span><span class="p">,</span> <span class="n">minwidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">minwidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="s2">&quot;nombre&quot;</span><span class="p">,</span> <span class="n">minwidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">220</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="s2">&quot;autor&quot;</span><span class="p">,</span> <span class="n">minwidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="s2">&quot;editorial&quot;</span><span class="p">,</span> <span class="n">minwidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="s2">&quot;categoria&quot;</span><span class="p">,</span> <span class="n">minwidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">column</span><span class="p">(</span><span class="s2">&quot;estado&quot;</span><span class="p">,</span> <span class="n">minwidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">110</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+            <span class="s2">&quot;&lt;ButtonRelease-1&gt;&quot;</span><span class="p">,</span>
+            <span class="k">lambda</span> <span class="n">evento</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">seleccionar_item</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tree</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_id</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_nombre</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_autor</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_editorial</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_año</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_categoria</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control_estado</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2023, Simon Bierozko.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

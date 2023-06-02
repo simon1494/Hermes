@@ -1,14 +1,20 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
-from model import Api
+from modelo import Api
+
+"""
+VIsta:
+    Administra la interfaz de nuestra aplicación. 
+"""
 
 
 class App(Api):
+    """
+    Estructura la interfaz gráfica, a la vez que incorpora todas las funcionalidades y lógica interna del programa, así como tambien conexión con la base de datos, al heredar de la clase model.Api
+    """
+
     def __init__(self, win):
-
-        self.crear_db()
-
         self.mensaje_error = (
             "\n\n"
             + "Tenga en cuenta:"
@@ -31,9 +37,19 @@ class App(Api):
         self.ventana = win
         self.ventana.title("Hermes BookSearch 1.0")
         self.ventana.config(bg="#091430")
-        self.ventana.geometry(self.centrar_ventana(self.ventana, 700, 750))
+        self.ventana.geometry(self.centrar_ventana(700, 750))
+        self.crear_db()
+        self.crear_variables_control()
+        self.crear_labels()
+        self.crear_entries()
+        self.crear_botones()
+        self.crear_treeview()
+        self.armar_treeview(self.tree)
 
-        #::::::::::::::Variables de control para la manipulación de los campos de Data Entry::::::::::
+    def crear_variables_control(self):
+        """
+        Crea las variables de control utilizadas para manipular a través de la aplicación la información de los registros.
+        """
 
         self.control_id = tk.StringVar()
         self.control_nombre = tk.StringVar()
@@ -53,8 +69,8 @@ class App(Api):
         self.control_estado.set("")
         self.control_consulta.set("")
 
-        #:::::::::::::::::::::::::::::::::::::::::::LABELS::::::::::::::::::::::::::::::::::::::::::::
-        #:::::::::::::::::::::::::::::Etiquetas de los campos de Data Entry:::::::::::::::::::::::::::
+    def crear_labels(self):
+        """Crea las etiquetas de los data entries."""
 
         self.fuente = Font(family="Consolas", size=12, weight="bold")
         self.fuente1 = Font(family="Consolas", size=9, weight="bold")
@@ -113,8 +129,8 @@ class App(Api):
         self.lb_categoria.place(x=92, y=253, width=93, height=30)
         self.lb_estado.place(x=92, y=298, width=93, height=30)
 
-        #:::::::::::::::::::::::::::::::::::ENTRIES & COMBOBOXES::::::::::::::::::::::::::::::::::::::
-        #::::::::::::::::::::::Entries y Comboboxes de los campos de Data Entry:::::::::::::::::::::::
+    def crear_entries(self):
+        """Crea los widgets de entrada de texto con los que el usuario interactuará para cargar información"""
 
         self.box_id = tk.Entry(
             self.ventana,
@@ -181,7 +197,8 @@ class App(Api):
         self.box_categoria.place(x=203, y=253, width=230, height=30)
         self.box_estado.place(x=203, y=298, width=130, height=30)
 
-        #::::::::::::::::::::Botonera general para interacción con el usuario:::::::::::::::::::::::::
+    def crear_botones(self):
+        """Crea los botones de nuestra aplicación"""
 
         self.bt_agregar = tk.Button(
             self.ventana,
@@ -262,7 +279,8 @@ class App(Api):
         self.bt_modificar.place(x=367, y=370, width=136, height=36)
         self.bt_consultar.place(x=538, y=370, width=136, height=36)
 
-        #::::::::::::::::Treeview donde se visualizan los datos de las consultas a DB:::::::::::::::::
+    def crear_treeview(self):
+        """Crea el Treeview de nuestra aplicación"""
 
         columnas = ("id", "nombre", "autor", "editorial", "categoria", "estado")
         self.tree = ttk.Treeview(self.ventana, columns=columnas)
@@ -283,15 +301,13 @@ class App(Api):
         self.tree.bind(
             "<ButtonRelease-1>",
             lambda evento: self.seleccionar_item(
-                a=self.tree,
-                b=self.control_id,
-                c=self.control_nombre,
-                d=self.control_autor,
-                e=self.control_editorial,
-                f=self.control_año,
-                g=self.control_categoria,
-                h=self.control_estado,
+                self.tree,
+                self.control_id,
+                self.control_nombre,
+                self.control_autor,
+                self.control_editorial,
+                self.control_año,
+                self.control_categoria,
+                self.control_estado,
             ),
         )
-
-        self.armar_treeview(self.tree)

@@ -1,17 +1,33 @@
 import pandas as pd
 import re
-from tkinter.messagebox import *
 import peewee as pw
+from screeninfo import get_monitors
+from tkinter.messagebox import *
+
+"""
+modelo.py:
+    Contiene las clases encargadas de administrar la conexión con la base de datos, la lógica interna del nuestra aplicación y funciones de validación de datos.
+"""
 
 db = pw.SqliteDatabase("biblioteca.db")
 
 
 class ModeloBase(pw.Model):
+    """
+    Clase que defina la base de datos para el ORM.
+    """
+
     class Meta:
+        """.. sphinx-autodoc-skip::"""
+
         database = db
 
 
 class Libro(ModeloBase):
+    """
+    Clase que define la tabla donde cargaremos los registros en la base de datos para el ORM
+    """
+
     id = pw.PrimaryKeyField()
     nombre = pw.TextField()
     autor = pw.TextField()
@@ -21,19 +37,32 @@ class Libro(ModeloBase):
     estado = pw.TextField()
 
     class Meta:
+        """.. sphinx-autodoc-skip::"""
+
         table_name = "libros"
 
 
 class Database:
-    # Comprueba si existe una base de datos y, en caso de no existir, la crea.
     @staticmethod
     def crear_db():
+        """
+        Crea una base de datos donde se almacenará la información de nuestra aplicación. La función se ejecuta cada vez que la aplicación es abierta, pero en el caso de que ya exista una base creada, entonces no tendrá ningún efecto.
+        """
         db.connect()
         db.create_tables([Libro])
 
-    # Envía una consulta INSERT a la DB con los datos ingresados por el usuario.
     @staticmethod
     def alta_db(nombre, autor, editorial, año, categoria, estado):
+        """
+        Genera el alta de un registro en la base de datos de nuestra aplicación.
+
+        :param nombre: String. Nombre del libro.
+        :param autor: String. Nombre del autor del libro.
+        :param editorial: String. Nombre de la editorial del libro.
+        :param año: String. Año de publicación del libro.
+        :param categoria: String. Categoría a la que pertenece el libro.
+        :param estado: String. Estado de existencia del libro en la biblioteca.
+        """
         libro = Libro()
         libro.nombre = nombre
         libro.autor = autor
@@ -43,16 +72,28 @@ class Database:
         libro.estado = estado
         libro.save()
 
-    # Envía una consulta DELETE a la DB con el id del item facilitado por el usuario.
     @staticmethod
     def baja_db(id):
+        """
+        Genera la baja de un registro en la base de datos de nuestra aplicación.
+
+        :param id: Integer. ID del libro que se desea eliminar."""
         registro = Libro.get(Libro.id == id)
         registro.delete_instance()
 
-    # Envía una consulta UPDATE a la DB con el id del item facilitado y realiza una
-    # actualización general de los datos.
     @staticmethod
     def modificar_db(id, nombre, autor, editorial, año, categoria, estado):
+        """
+        Actualiza los campos de un registro existente en la base de datos de nuestra aplicación.
+
+        :param id: Integer. ID del libro que se desea actualizar.
+        :param nombre: String. Nombre del libro.
+        :param autor: String. Nombre del autor del libro.
+        :param editorial: String. Nombre de la editorial del libro.
+        :param año: String. Año de publicación del libro.
+        :param categoria: String. Categoría a la que pertenece el libro.
+        :param estado: String. Estado de existencia del libro en la biblioteca.
+        """
         registro = Libro.update(
             nombre=nombre,
             autor=autor,
@@ -63,11 +104,14 @@ class Database:
         ).where(Libro.id == id)
         registro.execute()
 
-    # Envía una consulta SELECT a la DB y retorna el resultado en formato Dataframe.
-    # La cláusula WHERE (argumento 'x') puede ser suministrada por el usuario según
-    # su elección.
-
     def consultar_db(self, sobre=None, clausula=None, df=True):
+        """
+        Actualiza el Treeview de nuestra aplicación con el resultado consulta sobre el campo que elijamos.
+
+        :param sobre: String. Determina sobre qué campo de nuestra base se ejecutará la consulta. Por default None, lo que establece una busqueda de todos los registros.
+        :param clausula: String. Determina la expresión a matchear en los registros del campo seleccionado. Por default None, lo que establece una busqueda sin criterio.
+        :param df: Booleano. Determina si el resultado de la consulta en base de regresa en formado dataframe o lista. Por default en True (devuelve dataframe)
+        :return: Datos de consulta en formato d   ataframe o lista"""
         match sobre:
             case "Ver todo":
                 resultado = Libro.select().where(Libro.id > 0)
@@ -95,6 +139,13 @@ class Database:
 
     @staticmethod
     def _convertir_query(resultado, df):
+        """
+        Convierte el resultado de una consulta a base en dataframe o lista según corresponda.
+
+        :param resultado: Objeto propio del ORM Peewee. Es el resultado de una consulta.
+        :param df: Booleano. Seteado en True convierte el resultado en dataframe; de lo contrario, lista.
+        :return: Dataframe o lista. Resultado de la consulta a base convertido en formato conveniente.
+        """
         final = []
         for registro in resultado:
             final.append(
@@ -126,56 +177,92 @@ class Database:
 
 
 class LogicaInterna:
-
-    # Autocompleta los campos del Data Entry con los datos del libro# seleccionado
-    # por el usuario en el TreeView.
     def seleccionar_item(
         self,
-        a,
-        b,
-        c,
-        d,
-        e,
-        f,
-        g,
-        h,
+        tree,
+        id,
+        nombre,
+        autor,
+        editorial,
+        año,
+        categoria,
+        estado,
     ):
+        """
+        Ejecuta un autocompletado de los campos del data entry al clickear sobre un item del treeview.
+
+        :param id: Stringvar. Variable de control con datos del ID del libro.
+        :param nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param autor: Stringvar. Variable de control con datos del autor del libro.
+        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
+        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
+        """
         try:
-            item_ = a.focus()
+            item_ = tree.focus()
             selected = self._convertir_query(
-                Libro.select().where(Libro.id == a.item(item_)["values"][0]), False
+                Libro.select().where(Libro.id == tree.item(item_)["values"][0]), False
             )
-            self.blanquear_entradas(b, c, d, e, f, g, h)
-            b.set(selected[0][0])
-            c.set(selected[0][1])
-            d.set(selected[0][2])
-            e.set(selected[0][3])
-            f.set(selected[0][4])
-            g.set(selected[0][5])
-            h.set(selected[0][6])
+            self.blanquear_entradas(
+                id, nombre, autor, editorial, año, categoria, estado
+            )
+            id.set(selected[0][0])
+            nombre.set(selected[0][1])
+            autor.set(selected[0][2])
+            editorial.set(selected[0][3])
+            año.set(selected[0][4])
+            categoria.set(selected[0][5])
+            estado.set(selected[0][6])
         except IndexError:
             pass  # Pasa por alto el error en consola que ocurre al clickear en un espacio no valido del Treeview
 
-    # La función centra la ventana principal a partir de los datos de resolución de pantalla.
     @staticmethod
-    def centrar_ventana(win, window_width, window_height):
-        screen_width = win.winfo_screenwidth()
-        screen_height = win.winfo_screenheight()
+    def centrar_ventana(window_width, window_heigth):
+        """
+        Centra la ventana de nuestra aplicación en relación a la resolución actual de la pantalla.
+
+        :param window_width: Integer. Representa el ancho deseado de nuestra ventana principal en pixeles.
+        :param window_heigth: Integer. Representa el alto deseado de nuestra ventana principal en pixeles.
+        :return: String. Representa la base y altura de nuestro ventaba principal y el corrimiento necesario sobre ejes 'x' e 'y' respecto de la resolución para centrarla en pantalla.
+        """
+        monitores = get_monitors()
+        if monitores:
+            primer_monitor = monitores[0]
+            screen_width = primer_monitor.width
+            screen_heigth = primer_monitor.height
         center_x = int(screen_width / 2 - window_width / 2)
-        center_y = int(screen_height / 2 - window_height / 2)
-        return f"{window_width}x{window_height}+{center_x}+{center_y}"
+        center_y = int(screen_heigth / 2 - window_heigth / 2)
+        return f"{window_width}x{window_heigth}+{center_x}+{center_y}"
 
     def limpiar_y_armar(self, tree):
+        """
+        Blanquea y rearma el Treeview de nuestra aplicación.
+
+        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
+        """
         self.limpiar_treeview(tree)
         self.armar_treeview(tree)
 
-    # Vacía el Treeview
     def limpiar_treeview(self, tree):
+        """
+        Blanquea el Treeview de nuestra aplicación.
+
+        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
+        """
         for row in tree.get_children():
             tree.delete(row)
 
-    # Construye el TreeView con los datos retornados de una consulta SELECT a DB.
     def armar_treeview(self, tree, sobre=None, clausula=None):
+        """
+        Construye el Treeview de nuestra aplicación a partir de una consulta realizada a la base de datos.
+
+        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
+        :param sobre: String. Argumento interno para ejecutar la consulta. Define sobre qué campo se ejecutará. Por default en None, lo cual determina una consulta general.
+        :param clausula: String. Argumento interno para ejecutar la consulta. Define cual será el criterio de búsqueda. Por default en None, lo cual determina una consulta sin criterio.
+        """
         self.limpiar_treeview(tree)
         data = self.consultar_db(sobre, clausula, df=False)
         for i in range(0, len(data)):
@@ -192,7 +279,6 @@ class LogicaInterna:
                 ),
             )
 
-    # Vacía todos los datos existentes en los campos de Data Entry.
     def blanquear_entradas(
         self,
         control_id,
@@ -203,6 +289,17 @@ class LogicaInterna:
         control_categoria,
         control_estado,
     ):
+        """
+        Realiza un blanqueo de todos los data entry de nuestra aplicación.
+
+        :param control_id: Stringvar. Variable de control con datos del ID del libro.
+        :param control_nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param control_autor: Stringvar. Variable de control con datos del autor del libro.
+        :param control_editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param control_año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param control_categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param control_estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        """
         control_id.set("")
         control_nombre.set("")
         control_autor.set("")
@@ -211,8 +308,6 @@ class LogicaInterna:
         control_categoria.set("")
         control_estado.set("")
 
-    # Comprueba la validez de la expresión del campo solicitado en la búsqueda del usuario
-    # y retorna una consulta SQL en forma de STR o un mensaje de error en caso contrario.
     def armar_consulta(
         self,
         y,
@@ -225,6 +320,20 @@ class LogicaInterna:
         control_estado,
         mensaje_error,
     ):
+        """
+        Comprueba la validez de la expresión del campo solicitado en la búsqueda del usuario y lo convierte a un formato adecuado para realizar una consulta por ORM. En vaso de consulta inválida, lanza mensaje de error.
+
+        :param y: String. Representa una elección realizada por el usuario sobre qué tipo de consulta realizar.
+        :param control_id: Stringvar. Variable de control con datos del ID del libro.
+        :param control_nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param control_autor: Stringvar. Variable de control con datos del autor del libro.
+        :param control_editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param control_año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param control_categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param control_estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        :mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
+        :return: Campo de la base (String) y clausula de la consulta a realizar (String).
+        """
         patron_id = re.compile("\d+")
         patron_nombre = re.compile("[a-z0-9\sáéíóúñ]+", flags=re.I)
         patron_autor = re.compile("[a-záéíóúñ\s]+", flags=re.I)
@@ -327,8 +436,6 @@ class LogicaInterna:
                     clausula = control_estado.get()
                     return sobre, clausula
 
-    # Comprueba la validez de las expresiones en todos los campos del data entry y retorna
-    # True si son todas correctas o False en caso contrario.
     def validar_entradas(
         self,
         control_id,
@@ -339,6 +446,18 @@ class LogicaInterna:
         control_categoria,
         control_estado,
     ):
+        """
+        Comprueba la validez de las expresiones en todos los campos del data entry.
+
+        :param control_id: Stringvar. Variable de control con datos del ID del libro.
+        :param control_nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param control_autor: Stringvar. Variable de control con datos del autor del libro.
+        :param control_editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param control_año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param control_categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param control_estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        :return: True si la consulta es válida o False en caso contrario.
+        """
         patron_id = re.compile("\d*")
         patron_nombre = re.compile("[a-z0-9\sáéíóúñ]+", flags=re.I)
         patron_autor = re.compile("[a-záéíñóú\s]+", flags=re.I)
@@ -379,10 +498,22 @@ class LogicaInterna:
 
 
 class Api(Database, LogicaInterna):
-    # Ejecuta una acción INSERT sobre la DB al oprimir el botón "Añadir".
     def agregar_libro(
         self, id, nombre, autor, editorial, año, categoria, estado, mensaje_error, tree
     ):
+        """
+        Ejecuta instrucciones de alta al clickar el botón 'Añadir'. Luego, limpia y actualiza el treeview. En caso de datos inválidos, lanza mensaje de error.
+
+        :param id: Stringvar. Variable de control con datos del ID del libro.
+        :param nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param autor: Stringvar. Variable de control con datos del autor del libro.
+        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
+        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
+        """
         if self.validar_entradas(id, nombre, autor, editorial, año, categoria, estado):
             self.alta_db(
                 nombre.get(),
@@ -404,10 +535,22 @@ class Api(Database, LogicaInterna):
                 + mensaje_error,
             )
 
-    # Ejecuta una acción DELETE sobre la DB al oprimir el botón "Eliminar".
     def eliminar_libro(
         self, id, nombre, autor, editorial, año, categoria, estado, mensaje_error, tree
     ):
+        """
+        Ejecuta instrucciones de baja al clickar el botón 'Eliminar'. Luego, limpia y actualiza el treeview.
+
+        :param id: Stringvar. Variable de control con datos del ID del libro.
+        :param nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param autor: Stringvar. Variable de control con datos del autor del libro.
+        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
+        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
+        """
         patron_id = re.compile("\d+")
         if re.fullmatch(patron_id, id.get()) != None:
             answer = askyesno(
@@ -428,10 +571,22 @@ class Api(Database, LogicaInterna):
                 + mensaje_error,
             )
 
-    # Ejecuta una acción UPDATE sobre la DB al oprimir el botón "Modificar".
     def modificar_libro(
         self, id, nombre, autor, editorial, año, categoria, estado, mensaje_error, tree
     ):
+        """
+        Ejecuta instrucciones de actualización al clickar el botón 'Modificar'. Luego, limpia y actualiza el treeview. En caso de datos inválidos, lanza mensaje de error.
+
+        :param id: Stringvar. Variable de control con datos del ID del libro.
+        :param nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param autor: Stringvar. Variable de control con datos del autor del libro.
+        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
+        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
+        """
         if self.validar_entradas(id, nombre, autor, editorial, año, categoria, estado):
             answer = askyesno(
                 title="Confirmación",
@@ -459,7 +614,6 @@ class Api(Database, LogicaInterna):
                 + mensaje_error,
             )
 
-    # Ejecuta una acción SELECT sobre la DB al oprimir el botón "Consultar".
     def consultar(
         self,
         consulta,
@@ -473,6 +627,19 @@ class Api(Database, LogicaInterna):
         mensaje_error,
         tree,
     ):
+        """
+        Ejecuta instrucciones de consulta al clickar el botón 'Consultar'. Luego, limpia y actualiza el treeview. En caso de datos inválidos, lanza mensaje de error.
+
+        :param id: Stringvar. Variable de control con datos del ID del libro.
+        :param nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param autor: Stringvar. Variable de control con datos del autor del libro.
+        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
+        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
+        """
         if (
             self.armar_consulta(
                 consulta.get(),
