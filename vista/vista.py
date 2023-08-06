@@ -1,7 +1,11 @@
+import sys
+
+sys.path.append("../library")
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
-from modelo import Api
+from modelos.modelo import Api
+from vista.base_ventanas import VentanaBase
 
 """
 VIsta:
@@ -9,7 +13,7 @@ VIsta:
 """
 
 
-class App(Api):
+class App(Api, VentanaBase):
     """
     Estructura la interfaz gráfica, a la vez que incorpora todas las funcionalidades y lógica interna del programa, así como tambien conexión con la base de datos, al heredar de la clase model.Api
     """
