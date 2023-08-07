@@ -3,10 +3,10 @@ import sys
 sys.path.append("../library")
 import tkinter as tk
 from PIL import Image, ImageTk
-from vista.base_ventanas import VentanaBase
+from vista.modelos_vista import MetodosBaseVentanas
 
 
-class LogoInicio(VentanaBase):
+class LogoInicio(MetodosBaseVentanas):
     def __init__(
         self,
         display_time=5000,

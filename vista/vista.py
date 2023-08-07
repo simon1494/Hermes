@@ -4,8 +4,12 @@ sys.path.append("../library")
 import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
-from modelos.modelo import Api
-from vista.base_ventanas import VentanaBase
+from tkinter.ttk import Style
+from modelos.modelo import Modelo
+from vista.modelos_vista import VentanaConfig
+from vista.modelos_vista import Boton
+from vista.modelos_vista import Etiqueta
+from vista.modelos_vista import EntradaTexto
 
 """
 VIsta:
@@ -13,115 +17,58 @@ VIsta:
 """
 
 
-class App(Api, VentanaBase):
+class App(Modelo, VentanaConfig):
     """
     Estructura la interfaz gráfica, a la vez que incorpora todas las funcionalidades y lógica interna del programa, así como tambien conexión con la base de datos, al heredar de la clase model.Api
     """
 
     def __init__(self, win):
-        self.mensaje_error = (
-            "\n\n"
-            + "Tenga en cuenta:"
-            + "\n\n"
-            + "ID: debe ser un número entero"
-            + "\n"
-            + "Nombre: No debe contener caracteres especiales ni abreviatuas"
-            + "\n"
-            + "Autor: No debe contener números ni caracteres especiales"
-            + "\n"
-            + "Editorial: No debe contener carateres especiales"
-            + "\n"
-            + "Año: Debe ser un numero entero entre 1900 y 2029"
-            + "\n"
-            + "Categoría: Debe estar entre los items de la lista desplegable"
-            + "\n"
-            + "Estado: Debe estar entre los items de la lista desplegable"
-        )
-
         self.ventana = win
-        self.ventana.title("Hermes BookSearch 1.0")
-        self.ventana.config(bg="#091430")
+        self.ventana.title("Proyecto Hermes")
         self.ventana.geometry(self.centrar_ventana(700, 750))
-        self.crear_db()
-        self.crear_variables_control()
-        self.crear_labels()
-        self.crear_entries()
-        self.crear_botones()
-        self.crear_treeview()
-        self.armar_treeview(self.tree)
 
-    def crear_variables_control(self):
-        """
-        Crea las variables de control utilizadas para manipular a través de la aplicación la información de los registros.
-        """
+    def crear_estilos_y_fuentes(self):
+        """Crea estilos y fuentes utilizados por la interfaz gráfica"""
 
-        self.control_id = tk.StringVar()
-        self.control_nombre = tk.StringVar()
-        self.control_autor = tk.StringVar()
-        self.control_editorial = tk.StringVar()
-        self.control_año = tk.StringVar()
-        self.control_categoria = tk.StringVar()
-        self.control_estado = tk.StringVar()
-        self.control_consulta = tk.StringVar()
-
-        self.control_id.set("")
-        self.control_nombre.set("")
-        self.control_autor.set("")
-        self.control_editorial.set("")
-        self.control_año.set("")
-        self.control_categoria.set("")
-        self.control_estado.set("")
-        self.control_consulta.set("")
+        self.ESTILO_ETIQUETAS = Style(self.ventana)
+        self.ESTILO_ETIQUETAS.configure(
+            "TLabel",
+            background=self.COLOR_DE_FONDO_ETIQUETAS,
+            foreground=self.COLOR_DE_TEXTO_ETIQUETAS,
+        )
+        self.FUENTE = Font(family="Consolas", size=12, weight="bold")
+        self.FUENTE_CHICA = Font(family="Consolas", size=9, weight="bold")
+        self.ventana.config(bg=self.COLOR_DE_FONDO)
 
     def crear_labels(self):
         """Crea las etiquetas de los data entries."""
 
-        self.fuente = Font(family="Consolas", size=12, weight="bold")
-        self.fuente1 = Font(family="Consolas", size=9, weight="bold")
-
-        self.s = ttk.Style(self.ventana)
-        self.s.configure("TLabel", background="#091430", foreground="white")
-
-        self.lb_id = ttk.Label(
-            self.ventana, text="ID", anchor=tk.E, style="TLabel", font=self.fuente
-        )
-        self.lb_id_info = ttk.Label(
+        self.lb_id = Etiqueta(self.ventana, text="ID", font=self.FUENTE, style="TLabel")
+        self.lb_id_info = Etiqueta(
             self.ventana,
             text="(Usar solo para Eliminar, Modificar o Consultar)",
             anchor=tk.W,
+            font=self.FUENTE_CHICA,
             style="TLabel",
-            font=self.fuente1,
         )
 
-        self.lb_nombre = ttk.Label(
-            self.ventana, text="Nombre", anchor=tk.E, style="TLabel", font=self.fuente
+        self.lb_nombre = Etiqueta(
+            self.ventana, text="Nombre", font=self.FUENTE, style="TLabel"
         )
-        self.lb_autor = ttk.Label(
-            self.ventana, text="Autor", anchor=tk.E, style="TLabel", font=self.fuente
+        self.lb_autor = Etiqueta(
+            self.ventana, text="Autor", font=self.FUENTE, style="TLabel"
         )
-        self.lb_editorial = ttk.Label(
-            self.ventana,
-            text="Editorial",
-            anchor=tk.E,
-            style="TLabel",
-            font=self.fuente,
+        self.lb_editorial = Etiqueta(
+            self.ventana, text="Editorial", font=self.FUENTE, style="TLabel"
         )
-        self.lb_año = ttk.Label(
-            self.ventana,
-            text="Año publicación",
-            anchor=tk.E,
-            style="TLabel",
-            font=self.fuente,
+        self.lb_anio = Etiqueta(
+            self.ventana, text="anio publicación", font=self.FUENTE, style="TLabel"
         )
-        self.lb_categoria = ttk.Label(
-            self.ventana,
-            text="Categoría",
-            anchor=tk.E,
-            style="TLabel",
-            font=self.fuente,
+        self.lb_categoria = Etiqueta(
+            self.ventana, text="Categoría", font=self.FUENTE, style="TLabel"
         )
-        self.lb_estado = ttk.Label(
-            self.ventana, text="Estado", anchor=tk.E, style="TLabel", font=self.fuente
+        self.lb_estado = Etiqueta(
+            self.ventana, text="Estado", font=self.FUENTE, style="TLabel"
         )
 
         self.lb_id.place(x=82, y=28, width=103, height=30)
@@ -129,43 +76,44 @@ class App(Api, VentanaBase):
         self.lb_nombre.place(x=82, y=73, width=103, height=30)
         self.lb_autor.place(x=82, y=118, width=103, height=30)
         self.lb_editorial.place(x=82, y=163, width=103, height=30)
-        self.lb_año.place(x=18, y=208, width=167, height=30)
+        self.lb_anio.place(x=18, y=208, width=167, height=30)
         self.lb_categoria.place(x=92, y=253, width=93, height=30)
         self.lb_estado.place(x=92, y=298, width=93, height=30)
 
     def crear_entries(self):
         """Crea los widgets de entrada de texto con los que el usuario interactuará para cargar información"""
 
-        self.box_id = tk.Entry(
+        self.box_id = EntradaTexto(
             self.ventana,
             textvariable=self.control_id,
             bg="#FAC921",
-            font=("Consolas 11"),
         )
-        self.box_nombre = tk.Entry(
+        self.box_nombre = EntradaTexto(
             self.ventana,
             textvariable=self.control_nombre,
-            bg="#A5FFCE",
-            font=("Consolas 11"),
         )
-        self.box_autor = tk.Entry(
+        self.box_autor = EntradaTexto(
             self.ventana,
             textvariable=self.control_autor,
-            bg="#A5FFCE",
-            font=("Consolas 11"),
         )
-        self.box_editorial = tk.Entry(
+        self.box_editorial = EntradaTexto(
             self.ventana,
             textvariable=self.control_editorial,
-            bg="#A5FFCE",
-            font=("Consolas 11"),
         )
-        self.box_año = tk.Entry(
+        self.box_anio = EntradaTexto(
             self.ventana,
-            textvariable=self.control_año,
-            bg="#A5FFCE",
-            font=("Consolas 11"),
+            textvariable=self.control_anio,
         )
+
+        self.box_id.place(x=203, y=28, width=100, height=30)
+        self.box_nombre.place(x=203, y=73, width=300, height=30)
+        self.box_autor.place(x=203, y=118, width=230, height=30)
+        self.box_editorial.place(x=203, y=163, width=230, height=30)
+        self.box_anio.place(x=203, y=208, width=100, height=30)
+
+    def crear_combo_boxes(self):
+        """Crea los listados seleccionable con los que el usuario interactuará."""
+
         self.box_categoria = ttk.Combobox(
             self.ventana,
             textvariable=self.control_categoria,
@@ -176,7 +124,7 @@ class App(Api, VentanaBase):
             textvariable=self.control_estado,
             values=("En Biblioteca", "Prestado"),
         )
-        box_consulta = ttk.Combobox(
+        self.box_consulta = ttk.Combobox(
             self.ventana,
             textvariable=self.control_consulta,
             values=(
@@ -185,95 +133,79 @@ class App(Api, VentanaBase):
                 "Buscar nombre",
                 "Buscar autor",
                 "Buscar editorial",
-                "Buscar año",
+                "Buscar anio",
                 "Buscar categoria",
                 "Buscar estado",
             ),
             state="readonly",
         )
-        box_consulta.place(x=538, y=325, width=136, height=30)
 
-        self.box_id.place(x=203, y=28, width=100, height=30)
-        self.box_nombre.place(x=203, y=73, width=300, height=30)
-        self.box_autor.place(x=203, y=118, width=230, height=30)
-        self.box_editorial.place(x=203, y=163, width=230, height=30)
-        self.box_año.place(x=203, y=208, width=100, height=30)
         self.box_categoria.place(x=203, y=253, width=230, height=30)
         self.box_estado.place(x=203, y=298, width=130, height=30)
+        self.box_consulta.place(x=538, y=325, width=136, height=30)
 
     def crear_botones(self):
-        """Crea los botones de nuestra aplicación"""
+        """Crea los botones de nuestra aplicación."""
 
-        self.bt_agregar = tk.Button(
-            self.ventana,
+        self.bt_agregar = Boton(
+            master=self.ventana,
             text="Añadir",
             background="#22DB68",
-            activebackground="#751C3C",
-            font=("Consolas 12 bold"),
             command=lambda: self.agregar_libro(
                 self.control_id,
                 self.control_nombre,
                 self.control_autor,
                 self.control_editorial,
-                self.control_año,
+                self.control_anio,
                 self.control_categoria,
                 self.control_estado,
-                self.mensaje_error,
+                self.MENSAJE_DE_ERROR,
                 self.tree,
             ),
         )
-        self.bt_eliminar = tk.Button(
-            self.ventana,
+        self.bt_eliminar = Boton(
+            master=self.ventana,
             text="Eliminar",
-            background="#FAC921",
-            activebackground="#751C3C",
-            font=("Consolas 12 bold"),
             command=lambda: self.eliminar_libro(
                 self.control_id,
                 self.control_nombre,
                 self.control_autor,
                 self.control_editorial,
-                self.control_año,
+                self.control_anio,
                 self.control_categoria,
                 self.control_estado,
-                self.mensaje_error,
+                self.MENSAJE_DE_ERROR,
                 self.tree,
             ),
         )
-        self.bt_modificar = tk.Button(
-            self.ventana,
+        self.bt_modificar = Boton(
+            master=self.ventana,
             text="Modificar",
-            background="#FAC921",
-            activebackground="#751C3C",
-            font=("Consolas 12 bold"),
             command=lambda: self.modificar_libro(
                 self.control_id,
                 self.control_nombre,
                 self.control_autor,
                 self.control_editorial,
-                self.control_año,
+                self.control_anio,
                 self.control_categoria,
                 self.control_estado,
-                self.mensaje_error,
+                self.MENSAJE_DE_ERROR,
                 self.tree,
             ),
         )
-        self.bt_consultar = tk.Button(
-            self.ventana,
+        self.bt_consultar = Boton(
+            master=self.ventana,
             text="Consultar",
-            background="#FAC921",
-            activebackground="#751C3C",
-            font=("Consolas 12 bold"),
             command=lambda: self.consultar(
                 self.control_consulta,
                 self.control_id,
                 self.control_nombre,
                 self.control_autor,
                 self.control_editorial,
-                self.control_año,
+                self.control_anio,
                 self.control_categoria,
                 self.control_estado,
-                self.mensaje_error,
+                self.MENSAJE_DE_ERROR,
                 self.tree,
             ),
         )
@@ -283,8 +215,8 @@ class App(Api, VentanaBase):
         self.bt_modificar.place(x=367, y=370, width=136, height=36)
         self.bt_consultar.place(x=538, y=370, width=136, height=36)
 
-    def crear_treeview(self):
-        """Crea el Treeview de nuestra aplicación"""
+    def crear_y_armar_treeview(self):
+        """Crea el Treeview de nuestra aplicación y lo arma con la información que existe en base."""
 
         columnas = ("id", "nombre", "autor", "editorial", "categoria", "estado")
         self.tree = ttk.Treeview(self.ventana, columns=columnas)
@@ -310,8 +242,13 @@ class App(Api, VentanaBase):
                 self.control_nombre,
                 self.control_autor,
                 self.control_editorial,
-                self.control_año,
+                self.control_anio,
                 self.control_categoria,
                 self.control_estado,
             ),
         )
+        self.armar_treeview(self.tree)
+
+    def correr(self):
+        """Inicia el loop de nuestra interfaz gráfica."""
+        self.ventana.mainloop()
