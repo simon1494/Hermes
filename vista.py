@@ -5,13 +5,12 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
 from tkinter.ttk import Style
-
-from modelos.patron_observador import ObservadorABS
-from vista.modelos_vista import VentanaConfig
-from vista.modelos_vista import Boton
-from vista.modelos_vista import Etiqueta
-from vista.modelos_vista import EntradaTexto
-from vista.operaciones_widgets import WidgetOps
+from clases.patron_observador import ObservadorABS
+from clases.modelos_vista import VentanaConfig
+from clases.modelos_vista import Boton
+from clases.modelos_vista import Etiqueta
+from clases.modelos_vista import EntradaTexto
+from clases.operaciones_widgets import WidgetOps
 
 """
 Vista:
@@ -19,19 +18,20 @@ Vista:
 """
 
 
-class App(VentanaConfig, WidgetOps, ObservadorABS):
+class Vista(VentanaConfig, WidgetOps, ObservadorABS):
     """
     Estructura la interfaz gráfica, a la vez que incorpora todas las funcionalidades y lógica interna del programa, así como tambien conexión con la base de datos, al heredar de la clase model.Api
     """
 
     def __init__(self, win, objeto_observado):
+        # Agrego la VISTA al listado de observadores del MODELO
+        self.objeto_observado = objeto_observado
+        self.objeto_observado.agregar_observador(self)
+
         self.ventana = win
         self.ventana.title("Proyecto Hermes")
         self.ventana.geometry(self.centrar_ventana(700, 750))
-
-        # Agrego la VISTA al listado de observadores del MODELO
-        self.objeto_observado = objeto_observado
-        self.objeto_observado.agregar(self)
+        self.crear_todo()
 
     def crear_variables_control(self):
         """
@@ -197,10 +197,10 @@ class App(VentanaConfig, WidgetOps, ObservadorABS):
             master=self.ventana, text="Eliminar", command=lambda: self.baja()
         )
         self.bt_modificar = Boton(
-            master=self.ventana, text="Modificar", command=lambda: self.modificacion()
+            master=self.ventana, text="Modificar", command=lambda: self.modificar()
         )
         self.bt_consultar = Boton(
-            master=self.ventana, text="Consultar", command=lambda: self.consulta()
+            master=self.ventana, text="Consultar", command=lambda: self.consultar()
         )
 
         self.bt_agregar.place(x=25, y=370, width=136, height=36)
@@ -229,47 +229,51 @@ class App(VentanaConfig, WidgetOps, ObservadorABS):
         self.tree.column("estado", minwidth=0, width=110, anchor="center")
         self.tree.bind(
             "<ButtonRelease-1>",
-            lambda evento: self.seleccionar_item(
-                self.tree,
-                self.control_id,
-                self.control_nombre,
-                self.control_autor,
-                self.control_editorial,
-                self.control_anio,
-                self.control_categoria,
-                self.control_estado,
-            ),
+            lambda evento: self.seleccionar_item(self.tree, self.variables_de_control),
         )
         self.armar_treeview(self.tree)
 
+    def crear_todo(self):
+        self.crear_variables_control()
+        self.crear_estilos_y_fuentes()
+        self.crear_labels()
+        self.crear_entries()
+        self.crear_botones()
+        self.crear_combo_boxes()
+        self.crear_y_armar_treeview()
+        self.correr()
+
     def alta(self):
         if self.validar_entradas(self.variables_de_control):
-<<<<<<< Updated upstream
-            self.agregar_libro(self.variables_de_control)
-=======
-            self.objeto_observado.agregar_libro(
-                self.variables_de_control,
-                self.MENSAJE_DE_ERROR,
-            )
-            self.limpiar_y_armar(self.tree)
-            self.blanquear_entradas(self.variables_de_control)
->>>>>>> Stashed changes
-        else:
-            ...
+            self.objeto_observado.alta(self.variables_de_control)
 
     def baja(self):
-<<<<<<< Updated upstream
-=======
         if self.mostrar_pregunta_si_o_no("¿Realmente desea eliminar este libro?"):
             if self.validar_id(self.control_id):
-                self.objeto_observado.baja()
+                self.objeto_observado.baja(self.control_id)
+            else:
+                self.mostrar_mensaje_advertencia(
+                    f"El ID ingresado no es válido para ejecutar la acción."
+                )
 
-    def modificacion(self):
->>>>>>> Stashed changes
-        ...
+    def modificar(self):
+        if self.mostrar_pregunta_si_o_no("¿Realmente desea modificar este libro?"):
+            if self.validar_entradas(self.variables_de_control):
+                self.objeto_observado.modificar(self.variables_de_control)
+            else:
+                self.mostrar_mensaje_advertencia(
+                    f"Controle que todos los campos contengan datos válidos"
+                )
 
-    def consulta(self):
-        ...
+    def consultar(self):
+        if self.armar_consulta(self.variables_de_control):
+            sobre, clausula = self.armar_consulta(self.variables_de_control)
+            self.limpiar_treeview(self.tree)
+            self.armar_treeview(sobre=sobre, clausula=clausula)
+
+    def notificarse(self):
+        self.limpiar_y_armar(self.tree)
+        self.blanquear_entradas(self.variables_de_control)
 
     def correr(self):
         """Inicia el loop de nuestra interfaz gráfica."""

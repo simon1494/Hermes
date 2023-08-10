@@ -2,17 +2,17 @@ import sys
 
 sys.path.append("../library")
 import pandas as pd
-from modelos.patron_observador import Sujeto
-from modelos.estructura_base import Libro
-from modelos.cuadros_de_dialogo import Mensajes
-from modelos.cuadros_de_dialogo import mensaje_operacion
+from clases.patron_observador import Sujeto
+from clases.estructura_base import Libro
+from clases.cuadros_de_dialogo import Mensajes
+from clases.cuadros_de_dialogo import mensaje_operacion
 
 
-class DatabaseOps(Mensajes, Sujeto):
+class Modelo(Mensajes, Sujeto):
     def __init__(self, base_de_datos):
         self.db = base_de_datos
+        self.crear_db()
 
-    @classmethod
     def crear_db(self):
         """
         Crea una base de datos donde se almacenará la información de nuestra aplicación. La función se ejecuta cada vez que la aplicación es abierta, pero en el caso de que ya exista una base creada, entonces no tendrá ningún efecto.
@@ -23,9 +23,8 @@ class DatabaseOps(Mensajes, Sujeto):
         except Exception as error:
             self.db.mostrar_mensaje_error(f"Error creando base de datos: {error}")
 
-    @staticmethod
-    # @mensaje_operacion("alta")
-    def alta_db(nombre, autor, editorial, año, categoria, estado):
+    @mensaje_operacion("alta")
+    def alta_db(self, nombre, autor, editorial, año, categoria, estado):
         """
         Genera el alta de un registro en la base de datos de nuestra aplicación.
 
@@ -44,20 +43,20 @@ class DatabaseOps(Mensajes, Sujeto):
         libro.categoria = categoria
         libro.estado = estado
         libro.save()
+        self.notificar_a_observadores()
 
-    @staticmethod
     @mensaje_operacion("baja")
-    def baja_db(id):
+    def baja_db(self, id):
         """
         Genera la baja de un registro en la base de datos de nuestra aplicación.
 
         :param id: Integer. ID del libro que se desea eliminar."""
         registro = Libro.get(Libro.id == id)
         registro.delete_instance()
+        self.notificar_a_observadores()
 
-    @staticmethod
-    @mensaje_operacion("modificacion")
-    def modificar_db(id, nombre, autor, editorial, año, categoria, estado):
+    @mensaje_operacion("mod")
+    def modificar_db(self, id, nombre, autor, editorial, año, categoria, estado):
         """
         Actualiza los campos de un registro existente en la base de datos de nuestra aplicación.
 
@@ -69,6 +68,7 @@ class DatabaseOps(Mensajes, Sujeto):
         :param categoria: String. Categoría a la que pertenece el libro.
         :param estado: String. Estado de existencia del libro en la biblioteca.
         """
+        print("entre")
         registro = Libro.update(
             nombre=nombre,
             autor=autor,
@@ -78,6 +78,7 @@ class DatabaseOps(Mensajes, Sujeto):
             estado=estado,
         ).where(Libro.id == id)
         registro.execute()
+        self.notificar_a_observadores()
 
     def consultar_db(self, sobre=None, clausula=None, df=True):
         """
@@ -86,7 +87,7 @@ class DatabaseOps(Mensajes, Sujeto):
         :param sobre: String. Determina sobre qué campo de nuestra base se ejecutará la consulta. Por default None, lo que establece una busqueda de todos los registros.
         :param clausula: String. Determina la expresión a matchear en los registros del campo seleccionado. Por default None, lo que establece una busqueda sin criterio.
         :param df: Booleano. Determina si el resultado de la consulta en base de regresa en formado dataframe o lista. Por default en True (devuelve dataframe)
-        :return: Datos de consulta en formato d   ataframe o lista"""
+        :return: Datos de consulta en formato dataframe o lista"""
         match sobre:
             case "Ver todo":
                 resultado = Libro.select().where(Libro.id > 0)
@@ -122,7 +123,7 @@ class DatabaseOps(Mensajes, Sujeto):
         :return: Dataframe o lista. Resultado de la consulta a base convertido en formato conveniente.
         """
 
-        resultado = Libro.select().where(Libro.id.get == item)
+        resultado = Libro.select().where(Libro.id == item)
         final = []
         for registro in resultado:
             final.append(

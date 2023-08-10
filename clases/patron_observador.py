@@ -1,6 +1,3 @@
-from modelos.registro_de_logs import Logueador
-
-
 class Sujeto:
     observadores = []
 
@@ -12,9 +9,9 @@ class Sujeto:
 
     def notificar_a_observadores(self):
         for observador in self.observadores:
-            observador.darse_por_notificado()
+            observador.notificarse()
 
 
 class ObservadorABS:
-    def darse_por_notificado(self):
-        raise NotImplementedError("Método 'darse_por_notificado()' no implementado")
+    def notificarse(self):
+        raise NotImplementedError("Método 'notificarse()' no implementado")

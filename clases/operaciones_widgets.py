@@ -2,7 +2,7 @@ import sys
 
 sys.path.append("../library")
 import re
-from modelos.cuadros_de_dialogo import Mensajes
+from clases.cuadros_de_dialogo import Mensajes
 
 
 class WidgetOps(Mensajes):
@@ -32,10 +32,10 @@ class WidgetOps(Mensajes):
         try:
             item_ = tree.focus()
             item_2 = tree.item(item_)["values"][0]
-            selected = self._convertir_query(item_2, False)
-            self.blanquear_entradas(
-                id, nombre, autor, editorial, año, categoria, estado
+            selected = self.objeto_observado.consultar(
+                sobre="Buscar id", clausula=item_2, df=False
             )
+            self.blanquear_entradas(variables_de_control)
             id.set(selected[0][0])
             nombre.set(selected[0][1])
             autor.set(selected[0][2])
@@ -46,8 +46,6 @@ class WidgetOps(Mensajes):
         except IndexError:
             pass  # Pasa por alto el error en consola que ocurre al clickear en un espacio no valido del Treeview
 
-    # limpiar y armar el tree debería ser una operacion de update que triggerea el Sujeto.
-    #####################################################################################
     def limpiar_y_armar(self, tree):
         """
         Blanquea y rearma el Treeview de nuestra aplicación.
@@ -75,7 +73,7 @@ class WidgetOps(Mensajes):
         :param clausula: String. Argumento interno para ejecutar la consulta. Define cual será el criterio de búsqueda. Por default en None, lo cual determina una consulta sin criterio.
         """
         self.limpiar_treeview(tree)
-        data = self.consultar_db(sobre, clausula, df=False)
+        data = self.objeto_observado.consultar(sobre, clausula, df=False)
         for i in range(0, len(data)):
             tree.insert(
                 "",
@@ -89,8 +87,6 @@ class WidgetOps(Mensajes):
                     data[i][6],
                 ),
             )
-
-    #####################################################################################
 
     def blanquear_entradas(self, variables_de_control):
         """

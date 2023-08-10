@@ -3,7 +3,6 @@ import tkinter
 from tkinter import Button
 from tkinter import Entry
 from tkinter.ttk import Label
-from tkinter.ttk import Treeview
 
 
 class MetodosBaseVentanas:
