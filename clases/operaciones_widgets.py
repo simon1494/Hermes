@@ -33,7 +33,7 @@ class WidgetOps(Mensajes):
             item_ = tree.focus()
             item_2 = tree.item(item_)["values"][0]
             selected = self.objeto_observado.consultar(
-                sobre="Buscar id", clausula=item_2, df=False
+                sobre="Buscar id", clausula=item_2, df=False, item=True
             )
             self.blanquear_entradas(variables_de_control)
             id.set(selected[0][0])
@@ -116,7 +116,7 @@ class WidgetOps(Mensajes):
         categoria.set("")
         estado.set("")
 
-    def armar_consulta(self, y, variables_de_control, mensaje_error):
+    def armar_consulta(self, variables_de_control, mensaje_error):
         """
         Comprueba la validez de la expresión del campo solicitado en la búsqueda del usuario y lo convierte a un formato adecuado para realizar una consulta por ORM. En vaso de consulta inválida, lanza mensaje de error.
 
@@ -139,6 +139,7 @@ class WidgetOps(Mensajes):
         año = variables_de_control["año"]
         categoria = variables_de_control["categoria"]
         estado = variables_de_control["estado"]
+        consulta = variables_de_control["consulta"]
 
         patron_id = re.compile("\d+")
         patron_nombre = re.compile("[a-z0-9\sáéíóúñ]+", flags=re.I)
@@ -150,17 +151,9 @@ class WidgetOps(Mensajes):
         )
         patron_estado = re.compile("(En Biblioteca|Prestado)")
 
-        match y:
+        match consulta.get():
             case "Ver todo":
-                self.blanquear_entradas(
-                    id,
-                    nombre,
-                    autor,
-                    editorial,
-                    año,
-                    categoria,
-                    estado,
-                )
+                self.blanquear_entradas(variables_de_control)
                 sobre = "Ver todo"
                 clausula = None
                 return sobre, clausula

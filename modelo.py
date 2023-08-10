@@ -80,7 +80,7 @@ class Modelo(Mensajes, Sujeto):
         registro.execute()
         self.notificar_a_observadores()
 
-    def consultar_db(self, sobre=None, clausula=None, df=True):
+    def consultar_db(self, sobre, clausula, df, item):
         """
         Actualiza el Treeview de nuestra aplicación con el resultado consulta sobre el campo que elijamos.
 
@@ -109,12 +109,12 @@ class Modelo(Mensajes, Sujeto):
                 resultado = Libro.select().where(Libro.estado == clausula)
 
         # Crear el DataFrame a partir de la lista de datos de las filas
-        final = self._convertir_query(resultado, df)
+        final = self._convertir_query(resultado, df, item)
 
         return final
 
     @staticmethod
-    def _convertir_query(item, df):
+    def _convertir_query(resultado, df, item=False):
         """
         Convierte el resultado de una consulta a base en dataframe o lista según corresponda.
 
@@ -122,33 +122,62 @@ class Modelo(Mensajes, Sujeto):
         :param df: Booleano. Seteado en True convierte el resultado en dataframe; de lo contrario, lista.
         :return: Dataframe o lista. Resultado de la consulta a base convertido en formato conveniente.
         """
+        if item:
+            resultado_ = Libro.select().where(Libro.id == resultado)
+            final = []
+            for registro in resultado_:
+                final.append(
+                    [
+                        registro.id,
+                        registro.nombre,
+                        registro.autor,
+                        registro.editorial,
+                        registro.año,
+                        registro.categoria,
+                        registro.estado,
+                    ]
+                )
 
-        resultado = Libro.select().where(Libro.id == item)
-        final = []
-        for registro in resultado:
-            final.append(
-                [
-                    registro.id,
-                    registro.nombre,
-                    registro.autor,
-                    registro.editorial,
-                    registro.año,
-                    registro.categoria,
-                    registro.estado,
-                ]
-            )
+            if df:
+                final = pd.DataFrame(
+                    final,
+                    columns=[
+                        "id",
+                        "nombre",
+                        "autor",
+                        "editorial",
+                        "año",
+                        "categoria",
+                        "estado",
+                    ],
+                )
+            return final
+        else:
+            final = []
+            for registro in resultado:
+                final.append(
+                    [
+                        registro.id,
+                        registro.nombre,
+                        registro.autor,
+                        registro.editorial,
+                        registro.año,
+                        registro.categoria,
+                        registro.estado,
+                    ]
+                )
 
-        if df:
-            final = pd.DataFrame(
-                final,
-                columns=[
-                    "id",
-                    "nombre",
-                    "autor",
-                    "editorial",
-                    "año",
-                    "categoria",
-                    "estado",
-                ],
-            )
-        return final
+            if df:
+                final = pd.DataFrame(
+                    final,
+                    columns=[
+                        "id",
+                        "nombre",
+                        "autor",
+                        "editorial",
+                        "año",
+                        "categoria",
+                        "estado",
+                    ],
+                )
+            return final

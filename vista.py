@@ -266,10 +266,11 @@ class Vista(VentanaConfig, WidgetOps, ObservadorABS):
                 )
 
     def consultar(self):
-        if self.armar_consulta(self.variables_de_control):
-            sobre, clausula = self.armar_consulta(self.variables_de_control)
-            self.limpiar_treeview(self.tree)
-            self.armar_treeview(sobre=sobre, clausula=clausula)
+        sobre, clausula = self.armar_consulta(
+            self.variables_de_control, self.MENSAJE_DE_ERROR
+        )
+        self.limpiar_treeview(self.tree)
+        self.armar_treeview(self.tree, sobre, clausula)
 
     def notificarse(self):
         self.limpiar_y_armar(self.tree)

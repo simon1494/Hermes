@@ -28,10 +28,11 @@ class Controlador:
         año = variables_de_control["año"].get()
         categoria = variables_de_control["categoria"].get()
         estado = variables_de_control["estado"].get()
+
         self.modelo.modificar_db(id, nombre, autor, editorial, año, categoria, estado)
 
-    def consultar(self, sobre, clausula, df=True):
-        return self.modelo.consultar_db(sobre, clausula, df)
+    def consultar(self, sobre, clausula, df=True, item=None):
+        return self.modelo.consultar_db(sobre, clausula, df, item)
 
     def agregar_observador(self, observador):
         self.modelo.observadores.append(observador)

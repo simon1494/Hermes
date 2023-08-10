@@ -31,7 +31,7 @@ def mensaje_operacion(tipo_operacion):
                         title="Error en baja",
                         message=f"Se registro un error durante la baja: {error}",
                     )
-            if tipo_operacion == "modificacion":
+            if tipo_operacion == "mod":
                 try:
                     funcion(*args, **kwargs)
                     showinfo(
