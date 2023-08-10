@@ -1,4 +1,0 @@
-
-2023/08/09 19:07:59:   Realizada operación de alta
-2023/08/09 19:07:59:   ('INSERT INTO "libros" ("nombre", "autor", "editorial", "año", "categoria", "estado") VALUES (?, ?, ?, ?, ?, ?)', ['asdfg', 'sdf', 'asdf', '2015', 'Poesía', 'Prestado'])
-2023/08/09 19:07:59:   ('SELECT "t1"."id", "t1"."nombre", "t1"."autor", "t1"."editorial", "t1"."año", "t1"."categoria", "t1"."estado" FROM "libros" AS "t1" WHERE ("t1"."id" > ?)', [0])
