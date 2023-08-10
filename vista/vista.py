@@ -189,50 +189,13 @@ class App(Modelo, VentanaConfig, WidgetOps):
             command=lambda: self.alta(),
         )
         self.bt_eliminar = Boton(
-            master=self.ventana,
-            text="Eliminar",
-            command=lambda: self.eliminar_libro(
-                self.control_id,
-                self.control_nombre,
-                self.control_autor,
-                self.control_editorial,
-                self.control_anio,
-                self.control_categoria,
-                self.control_estado,
-                self.MENSAJE_DE_ERROR,
-                self.tree,
-            ),
+            master=self.ventana, text="Eliminar", command=lambda: self.baja()
         )
         self.bt_modificar = Boton(
-            master=self.ventana,
-            text="Modificar",
-            command=lambda: self.modificar_libro(
-                self.control_id,
-                self.control_nombre,
-                self.control_autor,
-                self.control_editorial,
-                self.control_anio,
-                self.control_categoria,
-                self.control_estado,
-                self.MENSAJE_DE_ERROR,
-                self.tree,
-            ),
+            master=self.ventana, text="Modificar", command=lambda: self.modificacion()
         )
         self.bt_consultar = Boton(
-            master=self.ventana,
-            text="Consultar",
-            command=lambda: self.consultar(
-                self.control_consulta,
-                self.control_id,
-                self.control_nombre,
-                self.control_autor,
-                self.control_editorial,
-                self.control_anio,
-                self.control_categoria,
-                self.control_estado,
-                self.MENSAJE_DE_ERROR,
-                self.tree,
-            ),
+            master=self.ventana, text="Consultar", command=lambda: self.consulta()
         )
 
         self.bt_agregar.place(x=25, y=370, width=136, height=36)
@@ -276,18 +239,11 @@ class App(Modelo, VentanaConfig, WidgetOps):
 
     def alta(self):
         if self.validar_entradas(self.variables_de_control):
-            self.agregar_libro(
-                self.variables_de_control,
-                self.MENSAJE_DE_ERROR,
-            )
-            self.limpiar_y_armar(self.tree)
-            self.blanquear_entradas(self.variables_de_control)
+            self.agregar_libro(self.variables_de_control)
         else:
             ...
 
-    def baja(
-        self,
-    ):
+    def baja(self):
         ...
 
     def modificacion(
