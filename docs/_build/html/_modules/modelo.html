@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>modelo &mdash; documentación de Hermes_BookSearch - 1.0.0</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/translations.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Hermes_BookSearch
+          </a>
+              <div class="version">
+                1.0.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../controlador.html">controlador module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modelo.html">modelo module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../vista.html">vista module</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Hermes_BookSearch</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Código de módulo</a></li>
+      <li class="breadcrumb-item active">modelo</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Código fuente para modelo</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">peewee</span> <span class="k">as</span> <span class="nn">pw</span>
+<span class="kn">from</span> <span class="nn">screeninfo</span> <span class="kn">import</span> <span class="n">get_monitors</span>
+<span class="kn">from</span> <span class="nn">tkinter.messagebox</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">modelo.py:</span>
+<span class="sd">    Contiene las clases encargadas de administrar la conexión con la base de datos, la lógica interna del nuestra aplicación y funciones de validación de datos.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">SqliteDatabase</span><span class="p">(</span><span class="s2">&quot;biblioteca.db&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ModeloBase"><a class="viewcode-back" href="../modelo.html#modelo.ModeloBase">[documentos]</a><span class="k">class</span> <span class="nc">ModeloBase</span><span class="p">(</span><span class="n">pw</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clase que defina la base de datos para el ORM.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;.. sphinx-autodoc-skip::&quot;&quot;&quot;</span>
+
+        <span class="n">database</span> <span class="o">=</span> <span class="n">db</span></div>
+
+
+<div class="viewcode-block" id="Libro"><a class="viewcode-back" href="../modelo.html#modelo.Libro">[documentos]</a><span class="k">class</span> <span class="nc">Libro</span><span class="p">(</span><span class="n">ModeloBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clase que define la tabla donde cargaremos los registros en la base de datos para el ORM</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">PrimaryKeyField</span><span class="p">()</span>
+    <span class="n">nombre</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">autor</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">editorial</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">año</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TimeField</span><span class="p">()</span>
+    <span class="n">categoria</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">estado</span> <span class="o">=</span> <span class="n">pw</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;.. sphinx-autodoc-skip::&quot;&quot;&quot;</span>
+
+        <span class="n">table_name</span> <span class="o">=</span> <span class="s2">&quot;libros&quot;</span></div>
+
+
+<div class="viewcode-block" id="Database"><a class="viewcode-back" href="../modelo.html#modelo.Database">[documentos]</a><span class="k">class</span> <span class="nc">Database</span><span class="p">:</span>
+<div class="viewcode-block" id="Database.crear_db"><a class="viewcode-back" href="../modelo.html#modelo.Database.crear_db">[documentos]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">crear_db</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Crea una base de datos donde se almacenará la información de nuestra aplicación. La función se ejecuta cada vez que la aplicación es abierta, pero en el caso de que ya exista una base creada, entonces no tendrá ningún efecto.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">create_tables</span><span class="p">([</span><span class="n">Libro</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Database.alta_db"><a class="viewcode-back" href="../modelo.html#modelo.Database.alta_db">[documentos]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">alta_db</span><span class="p">(</span><span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Genera el alta de un registro en la base de datos de nuestra aplicación.</span>
+
+<span class="sd">        :param nombre: String. Nombre del libro.</span>
+<span class="sd">        :param autor: String. Nombre del autor del libro.</span>
+<span class="sd">        :param editorial: String. Nombre de la editorial del libro.</span>
+<span class="sd">        :param año: String. Año de publicación del libro.</span>
+<span class="sd">        :param categoria: String. Categoría a la que pertenece el libro.</span>
+<span class="sd">        :param estado: String. Estado de existencia del libro en la biblioteca.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">libro</span> <span class="o">=</span> <span class="n">Libro</span><span class="p">()</span>
+        <span class="n">libro</span><span class="o">.</span><span class="n">nombre</span> <span class="o">=</span> <span class="n">nombre</span>
+        <span class="n">libro</span><span class="o">.</span><span class="n">autor</span> <span class="o">=</span> <span class="n">autor</span>
+        <span class="n">libro</span><span class="o">.</span><span class="n">editorial</span> <span class="o">=</span> <span class="n">editorial</span>
+        <span class="n">libro</span><span class="o">.</span><span class="n">año</span> <span class="o">=</span> <span class="n">año</span>
+        <span class="n">libro</span><span class="o">.</span><span class="n">categoria</span> <span class="o">=</span> <span class="n">categoria</span>
+        <span class="n">libro</span><span class="o">.</span><span class="n">estado</span> <span class="o">=</span> <span class="n">estado</span>
+        <span class="n">libro</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Database.baja_db"><a class="viewcode-back" href="../modelo.html#modelo.Database.baja_db">[documentos]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">baja_db</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Genera la baja de un registro en la base de datos de nuestra aplicación.</span>
+
+<span class="sd">        :param id: Integer. ID del libro que se desea eliminar.&quot;&quot;&quot;</span>
+        <span class="n">registro</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span>
+        <span class="n">registro</span><span class="o">.</span><span class="n">delete_instance</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Database.modificar_db"><a class="viewcode-back" href="../modelo.html#modelo.Database.modificar_db">[documentos]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">modificar_db</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Actualiza los campos de un registro existente en la base de datos de nuestra aplicación.</span>
+
+<span class="sd">        :param id: Integer. ID del libro que se desea actualizar.</span>
+<span class="sd">        :param nombre: String. Nombre del libro.</span>
+<span class="sd">        :param autor: String. Nombre del autor del libro.</span>
+<span class="sd">        :param editorial: String. Nombre de la editorial del libro.</span>
+<span class="sd">        :param año: String. Año de publicación del libro.</span>
+<span class="sd">        :param categoria: String. Categoría a la que pertenece el libro.</span>
+<span class="sd">        :param estado: String. Estado de existencia del libro en la biblioteca.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">registro</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">nombre</span><span class="o">=</span><span class="n">nombre</span><span class="p">,</span>
+            <span class="n">autor</span><span class="o">=</span><span class="n">autor</span><span class="p">,</span>
+            <span class="n">editorial</span><span class="o">=</span><span class="n">editorial</span><span class="p">,</span>
+            <span class="n">año</span><span class="o">=</span><span class="n">año</span><span class="p">,</span>
+            <span class="n">categoria</span><span class="o">=</span><span class="n">categoria</span><span class="p">,</span>
+            <span class="n">estado</span><span class="o">=</span><span class="n">estado</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span>
+        <span class="n">registro</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Database.consultar_db"><a class="viewcode-back" href="../modelo.html#modelo.Database.consultar_db">[documentos]</a>    <span class="k">def</span> <span class="nf">consultar_db</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sobre</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clausula</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Actualiza el Treeview de nuestra aplicación con el resultado consulta sobre el campo que elijamos.</span>
+
+<span class="sd">        :param sobre: String. Determina sobre qué campo de nuestra base se ejecutará la consulta. Por default None, lo que establece una busqueda de todos los registros.</span>
+<span class="sd">        :param clausula: String. Determina la expresión a matchear en los registros del campo seleccionado. Por default None, lo que establece una busqueda sin criterio.</span>
+<span class="sd">        :param df: Booleano. Determina si el resultado de la consulta en base de regresa en formado dataframe o lista. Por default en True (devuelve dataframe)</span>
+<span class="sd">        :return: Datos de consulta en formato d   ataframe o lista&quot;&quot;&quot;</span>
+        <span class="k">match</span> <span class="n">sobre</span><span class="p">:</span>
+            <span class="k">case</span> <span class="s2">&quot;Ver todo&quot;</span><span class="p">:</span>
+                <span class="n">resultado</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">id</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">case</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">resultado</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">id</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar id&quot;</span><span class="p">:</span>
+                <span class="n">resultado</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">clausula</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar nombre&quot;</span><span class="p">:</span>
+                <span class="n">resultado</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">nombre</span> <span class="o">==</span> <span class="n">clausula</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar autor&quot;</span><span class="p">:</span>
+                <span class="n">resultado</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">autor</span> <span class="o">==</span> <span class="n">clausula</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar editorial&quot;</span><span class="p">:</span>
+                <span class="n">resultado</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">editorial</span> <span class="o">&gt;</span> <span class="n">clausula</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar año&quot;</span><span class="p">:</span>
+                <span class="n">resultado</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">año</span> <span class="o">==</span> <span class="n">clausula</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar categoria&quot;</span><span class="p">:</span>
+                <span class="n">resultado</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">categoria</span> <span class="o">==</span> <span class="n">clausula</span><span class="p">)</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar estado&quot;</span><span class="p">:</span>
+                <span class="n">resultado</span> <span class="o">=</span> <span class="n">Libro</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">estado</span> <span class="o">==</span> <span class="n">clausula</span><span class="p">)</span>
+
+        <span class="c1"># Crear el DataFrame a partir de la lista de datos de las filas</span>
+        <span class="n">final</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convertir_query</span><span class="p">(</span><span class="n">resultado</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">final</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_convertir_query</span><span class="p">(</span><span class="n">resultado</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convierte el resultado de una consulta a base en dataframe o lista según corresponda.</span>
+
+<span class="sd">        :param resultado: Objeto propio del ORM Peewee. Es el resultado de una consulta.</span>
+<span class="sd">        :param df: Booleano. Seteado en True convierte el resultado en dataframe; de lo contrario, lista.</span>
+<span class="sd">        :return: Dataframe o lista. Resultado de la consulta a base convertido en formato conveniente.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">final</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">registro</span> <span class="ow">in</span> <span class="n">resultado</span><span class="p">:</span>
+            <span class="n">final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">registro</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="n">registro</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+                    <span class="n">registro</span><span class="o">.</span><span class="n">autor</span><span class="p">,</span>
+                    <span class="n">registro</span><span class="o">.</span><span class="n">editorial</span><span class="p">,</span>
+                    <span class="n">registro</span><span class="o">.</span><span class="n">año</span><span class="p">,</span>
+                    <span class="n">registro</span><span class="o">.</span><span class="n">categoria</span><span class="p">,</span>
+                    <span class="n">registro</span><span class="o">.</span><span class="n">estado</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">df</span><span class="p">:</span>
+            <span class="n">final</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">final</span><span class="p">,</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;nombre&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;autor&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;editorial&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;año&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;categoria&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;estado&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">final</span></div>
+
+
+<div class="viewcode-block" id="LogicaInterna"><a class="viewcode-back" href="../modelo.html#modelo.LogicaInterna">[documentos]</a><span class="k">class</span> <span class="nc">LogicaInterna</span><span class="p">:</span>
+<div class="viewcode-block" id="LogicaInterna.seleccionar_item"><a class="viewcode-back" href="../modelo.html#modelo.LogicaInterna.seleccionar_item">[documentos]</a>    <span class="k">def</span> <span class="nf">seleccionar_item</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tree</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">,</span>
+        <span class="n">nombre</span><span class="p">,</span>
+        <span class="n">autor</span><span class="p">,</span>
+        <span class="n">editorial</span><span class="p">,</span>
+        <span class="n">año</span><span class="p">,</span>
+        <span class="n">categoria</span><span class="p">,</span>
+        <span class="n">estado</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ejecuta un autocompletado de los campos del data entry al clickear sobre un item del treeview.</span>
+
+<span class="sd">        :param id: Stringvar. Variable de control con datos del ID del libro.</span>
+<span class="sd">        :param nombre: Stringvar. Variable de control con datos del nombre del libro.</span>
+<span class="sd">        :param autor: Stringvar. Variable de control con datos del autor del libro.</span>
+<span class="sd">        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.</span>
+<span class="sd">        :param año: Stringvar. Variable de control con datos del año de publicación del libro.</span>
+<span class="sd">        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.</span>
+<span class="sd">        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.</span>
+<span class="sd">        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.</span>
+<span class="sd">        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">item_</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">focus</span><span class="p">()</span>
+            <span class="n">selected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convertir_query</span><span class="p">(</span>
+                <span class="n">Libro</span><span class="o">.</span><span class="n">select</span><span class="p">()</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Libro</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">tree</span><span class="o">.</span><span class="n">item</span><span class="p">(</span><span class="n">item_</span><span class="p">)[</span><span class="s2">&quot;values&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span> <span class="kc">False</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blanquear_entradas</span><span class="p">(</span>
+                <span class="nb">id</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span>
+            <span class="p">)</span>
+            <span class="nb">id</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">nombre</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">autor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">editorial</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">año</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">4</span><span class="p">])</span>
+            <span class="n">categoria</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">5</span><span class="p">])</span>
+            <span class="n">estado</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">selected</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">6</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># Pasa por alto el error en consola que ocurre al clickear en un espacio no valido del Treeview</span></div>
+
+<div class="viewcode-block" id="LogicaInterna.centrar_ventana"><a class="viewcode-back" href="../modelo.html#modelo.LogicaInterna.centrar_ventana">[documentos]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">centrar_ventana</span><span class="p">(</span><span class="n">window_width</span><span class="p">,</span> <span class="n">window_heigth</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Centra la ventana de nuestra aplicación en relación a la resolución actual de la pantalla.</span>
+
+<span class="sd">        :param window_width: Integer. Representa el ancho deseado de nuestra ventana principal en pixeles.</span>
+<span class="sd">        :param window_heigth: Integer. Representa el alto deseado de nuestra ventana principal en pixeles.</span>
+<span class="sd">        :return: String. Representa la base y altura de nuestro ventaba principal y el corrimiento necesario sobre ejes &#39;x&#39; e &#39;y&#39; respecto de la resolución para centrarla en pantalla.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">monitores</span> <span class="o">=</span> <span class="n">get_monitors</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">monitores</span><span class="p">:</span>
+            <span class="n">primer_monitor</span> <span class="o">=</span> <span class="n">monitores</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">screen_width</span> <span class="o">=</span> <span class="n">primer_monitor</span><span class="o">.</span><span class="n">width</span>
+            <span class="n">screen_heigth</span> <span class="o">=</span> <span class="n">primer_monitor</span><span class="o">.</span><span class="n">height</span>
+        <span class="n">center_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screen_width</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">window_width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">center_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screen_heigth</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">window_heigth</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">window_width</span><span class="si">}</span><span class="s2">x</span><span class="si">{</span><span class="n">window_heigth</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">center_x</span><span class="si">}</span><span class="s2">+</span><span class="si">{</span><span class="n">center_y</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+<div class="viewcode-block" id="LogicaInterna.limpiar_y_armar"><a class="viewcode-back" href="../modelo.html#modelo.LogicaInterna.limpiar_y_armar">[documentos]</a>    <span class="k">def</span> <span class="nf">limpiar_y_armar</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Blanquea y rearma el Treeview de nuestra aplicación.</span>
+
+<span class="sd">        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limpiar_treeview</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">armar_treeview</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogicaInterna.limpiar_treeview"><a class="viewcode-back" href="../modelo.html#modelo.LogicaInterna.limpiar_treeview">[documentos]</a>    <span class="k">def</span> <span class="nf">limpiar_treeview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Blanquea el Treeview de nuestra aplicación.</span>
+
+<span class="sd">        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">get_children</span><span class="p">():</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogicaInterna.armar_treeview"><a class="viewcode-back" href="../modelo.html#modelo.LogicaInterna.armar_treeview">[documentos]</a>    <span class="k">def</span> <span class="nf">armar_treeview</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tree</span><span class="p">,</span> <span class="n">sobre</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clausula</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construye el Treeview de nuestra aplicación a partir de una consulta realizada a la base de datos.</span>
+
+<span class="sd">        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.</span>
+<span class="sd">        :param sobre: String. Argumento interno para ejecutar la consulta. Define sobre qué campo se ejecutará. Por default en None, lo cual determina una consulta general.</span>
+<span class="sd">        :param clausula: String. Argumento interno para ejecutar la consulta. Define cual será el criterio de búsqueda. Por default en None, lo cual determina una consulta sin criterio.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limpiar_treeview</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consultar_db</span><span class="p">(</span><span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
+                <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="n">values</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">3</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">5</span><span class="p">],</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">6</span><span class="p">],</span>
+                <span class="p">),</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogicaInterna.blanquear_entradas"><a class="viewcode-back" href="../modelo.html#modelo.LogicaInterna.blanquear_entradas">[documentos]</a>    <span class="k">def</span> <span class="nf">blanquear_entradas</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">control_id</span><span class="p">,</span>
+        <span class="n">control_nombre</span><span class="p">,</span>
+        <span class="n">control_autor</span><span class="p">,</span>
+        <span class="n">control_editorial</span><span class="p">,</span>
+        <span class="n">control_año</span><span class="p">,</span>
+        <span class="n">control_categoria</span><span class="p">,</span>
+        <span class="n">control_estado</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Realiza un blanqueo de todos los data entry de nuestra aplicación.</span>
+
+<span class="sd">        :param control_id: Stringvar. Variable de control con datos del ID del libro.</span>
+<span class="sd">        :param control_nombre: Stringvar. Variable de control con datos del nombre del libro.</span>
+<span class="sd">        :param control_autor: Stringvar. Variable de control con datos del autor del libro.</span>
+<span class="sd">        :param control_editorial: Stringvar. Variable de control con datos de la editorial del libro.</span>
+<span class="sd">        :param control_año: Stringvar. Variable de control con datos del año de publicación del libro.</span>
+<span class="sd">        :param control_categoria: Stringvar. Variable de control con datos de la categoría del libro.</span>
+<span class="sd">        :param control_estado: Stringvar. Variable de control con datos del estado de existencia del libro.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">control_id</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">control_nombre</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">control_autor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">control_editorial</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">control_año</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">control_categoria</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">control_estado</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LogicaInterna.armar_consulta"><a class="viewcode-back" href="../modelo.html#modelo.LogicaInterna.armar_consulta">[documentos]</a>    <span class="k">def</span> <span class="nf">armar_consulta</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">y</span><span class="p">,</span>
+        <span class="n">control_id</span><span class="p">,</span>
+        <span class="n">control_nombre</span><span class="p">,</span>
+        <span class="n">control_autor</span><span class="p">,</span>
+        <span class="n">control_editorial</span><span class="p">,</span>
+        <span class="n">control_año</span><span class="p">,</span>
+        <span class="n">control_categoria</span><span class="p">,</span>
+        <span class="n">control_estado</span><span class="p">,</span>
+        <span class="n">mensaje_error</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Comprueba la validez de la expresión del campo solicitado en la búsqueda del usuario y lo convierte a un formato adecuado para realizar una consulta por ORM. En vaso de consulta inválida, lanza mensaje de error.</span>
+
+<span class="sd">        :param y: String. Representa una elección realizada por el usuario sobre qué tipo de consulta realizar.</span>
+<span class="sd">        :param control_id: Stringvar. Variable de control con datos del ID del libro.</span>
+<span class="sd">        :param control_nombre: Stringvar. Variable de control con datos del nombre del libro.</span>
+<span class="sd">        :param control_autor: Stringvar. Variable de control con datos del autor del libro.</span>
+<span class="sd">        :param control_editorial: Stringvar. Variable de control con datos de la editorial del libro.</span>
+<span class="sd">        :param control_año: Stringvar. Variable de control con datos del año de publicación del libro.</span>
+<span class="sd">        :param control_categoria: Stringvar. Variable de control con datos de la categoría del libro.</span>
+<span class="sd">        :param control_estado: Stringvar. Variable de control con datos del estado de existencia del libro.</span>
+<span class="sd">        :mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.</span>
+<span class="sd">        :return: Campo de la base (String) y clausula de la consulta a realizar (String).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">patron_id</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;\d+&quot;</span><span class="p">)</span>
+        <span class="n">patron_nombre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[a-z0-9\sáéíóúñ]+&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+        <span class="n">patron_autor</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[a-záéíóúñ\s]+&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+        <span class="n">patron_editorial</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[a-z0-9\sáéíóúñ]+&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+        <span class="n">patron_año</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(19[0-9]</span><span class="si">{2}</span><span class="s2">|20[0-2][0-9])&quot;</span><span class="p">)</span>
+        <span class="n">patron_categoria</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="s2">&quot;(Ficción|Ensayo|Poesía|Filosofía|Sociología|Otros)&quot;</span>
+        <span class="p">)</span>
+        <span class="n">patron_estado</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(En Biblioteca|Prestado)&quot;</span><span class="p">)</span>
+
+        <span class="k">match</span> <span class="n">y</span><span class="p">:</span>
+            <span class="k">case</span> <span class="s2">&quot;Ver todo&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">blanquear_entradas</span><span class="p">(</span>
+                    <span class="n">control_id</span><span class="p">,</span>
+                    <span class="n">control_nombre</span><span class="p">,</span>
+                    <span class="n">control_autor</span><span class="p">,</span>
+                    <span class="n">control_editorial</span><span class="p">,</span>
+                    <span class="n">control_año</span><span class="p">,</span>
+                    <span class="n">control_categoria</span><span class="p">,</span>
+                    <span class="n">control_estado</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">sobre</span> <span class="o">=</span> <span class="s2">&quot;Ver todo&quot;</span>
+                <span class="n">clausula</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">return</span> <span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar id&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_id</span><span class="p">,</span> <span class="n">control_id</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">showerror</span><span class="p">(</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error de escritura&quot;</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Por favor, ingrese un ID válido para realizar la búsqueda.&quot;</span>
+                        <span class="o">+</span> <span class="n">mensaje_error</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sobre</span> <span class="o">=</span> <span class="s2">&quot;Buscar id&quot;</span>
+                    <span class="n">clausula</span> <span class="o">=</span> <span class="n">control_id</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar nombre&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_nombre</span><span class="p">,</span> <span class="n">control_nombre</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">showerror</span><span class="p">(</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error de escritura&quot;</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Por favor, ingrese un nombre válido para realizar la búsqueda.&quot;</span>
+                        <span class="o">+</span> <span class="n">mensaje_error</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sobre</span> <span class="o">=</span> <span class="s2">&quot;Buscar nombre&quot;</span>
+                    <span class="n">clausula</span> <span class="o">=</span> <span class="n">control_nombre</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar autor&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_autor</span><span class="p">,</span> <span class="n">control_autor</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">showerror</span><span class="p">(</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error de escritura&quot;</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Por favor, ingrese un autor válido para realizar la búsqueda.&quot;</span>
+                        <span class="o">+</span> <span class="n">mensaje_error</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sobre</span> <span class="o">=</span> <span class="s2">&quot;Buscar autor&quot;</span>
+                    <span class="n">clausula</span> <span class="o">=</span> <span class="n">control_autor</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar editorial&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_editorial</span><span class="p">,</span> <span class="n">control_editorial</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">showerror</span><span class="p">(</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error de escritura&quot;</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Por favor, ingrese una editorial válida para realizar la búsqueda.&quot;</span>
+                        <span class="o">+</span> <span class="n">mensaje_error</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sobre</span> <span class="o">=</span> <span class="s2">&quot;Buscar editorial&quot;</span>
+                    <span class="n">clausula</span> <span class="o">=</span> <span class="n">control_editorial</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar año&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_año</span><span class="p">,</span> <span class="n">control_año</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">showerror</span><span class="p">(</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error de escritura&quot;</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Por favor, ingrese un año válido para realizar la búsqueda.&quot;</span>
+                        <span class="o">+</span> <span class="n">mensaje_error</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sobre</span> <span class="o">=</span> <span class="s2">&quot;Buscar año&quot;</span>
+                    <span class="n">clausula</span> <span class="o">=</span> <span class="n">control_año</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar categoria&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_categoria</span><span class="p">,</span> <span class="n">control_categoria</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">showerror</span><span class="p">(</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error de escritura&quot;</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Por favor, ingrese una categoria válida para realizar la búsqueda.&quot;</span>
+                        <span class="o">+</span> <span class="n">mensaje_error</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sobre</span> <span class="o">=</span> <span class="s2">&quot;Buscar categoria&quot;</span>
+                    <span class="n">clausula</span> <span class="o">=</span> <span class="n">control_categoria</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span>
+            <span class="k">case</span> <span class="s2">&quot;Buscar estado&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_estado</span><span class="p">,</span> <span class="n">control_estado</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">showerror</span><span class="p">(</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error de escritura&quot;</span><span class="p">,</span>
+                        <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Por favor, ingrese un estado válido para realizar la búsqueda.&quot;</span>
+                        <span class="o">+</span> <span class="n">mensaje_error</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sobre</span> <span class="o">=</span> <span class="s2">&quot;Buscar estado&quot;</span>
+                    <span class="n">clausula</span> <span class="o">=</span> <span class="n">control_estado</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span></div>
+
+<div class="viewcode-block" id="LogicaInterna.validar_entradas"><a class="viewcode-back" href="../modelo.html#modelo.LogicaInterna.validar_entradas">[documentos]</a>    <span class="k">def</span> <span class="nf">validar_entradas</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">control_id</span><span class="p">,</span>
+        <span class="n">control_nombre</span><span class="p">,</span>
+        <span class="n">control_autor</span><span class="p">,</span>
+        <span class="n">control_editorial</span><span class="p">,</span>
+        <span class="n">control_año</span><span class="p">,</span>
+        <span class="n">control_categoria</span><span class="p">,</span>
+        <span class="n">control_estado</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Comprueba la validez de las expresiones en todos los campos del data entry.</span>
+
+<span class="sd">        :param control_id: Stringvar. Variable de control con datos del ID del libro.</span>
+<span class="sd">        :param control_nombre: Stringvar. Variable de control con datos del nombre del libro.</span>
+<span class="sd">        :param control_autor: Stringvar. Variable de control con datos del autor del libro.</span>
+<span class="sd">        :param control_editorial: Stringvar. Variable de control con datos de la editorial del libro.</span>
+<span class="sd">        :param control_año: Stringvar. Variable de control con datos del año de publicación del libro.</span>
+<span class="sd">        :param control_categoria: Stringvar. Variable de control con datos de la categoría del libro.</span>
+<span class="sd">        :param control_estado: Stringvar. Variable de control con datos del estado de existencia del libro.</span>
+<span class="sd">        :return: True si la consulta es válida o False en caso contrario.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">patron_id</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;\d*&quot;</span><span class="p">)</span>
+        <span class="n">patron_nombre</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[a-z0-9\sáéíóúñ]+&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+        <span class="n">patron_autor</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[a-záéíñóú\s]+&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+        <span class="n">patron_editorial</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[a-z0-9\sáéñíóú]+&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+        <span class="n">patron_año</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(19|20)[0-9]</span><span class="si">{2}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">patron_categoria</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+            <span class="s2">&quot;(Ficción|Ensayo|Poesía|Filosofía|Sociología|Otros)&quot;</span>
+        <span class="p">)</span>
+        <span class="n">patron_estado</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(En Biblioteca|Prestado)&quot;</span><span class="p">)</span>
+
+        <span class="n">con0</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">con1</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">con2</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">con3</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">con4</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">con5</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">con6</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_nombre</span><span class="p">,</span> <span class="n">control_nombre</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">con0</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_autor</span><span class="p">,</span> <span class="n">control_autor</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">con1</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_editorial</span><span class="p">,</span> <span class="n">control_editorial</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">con2</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_año</span><span class="p">,</span> <span class="n">control_año</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">con3</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_categoria</span><span class="p">,</span> <span class="n">control_categoria</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">con4</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_estado</span><span class="p">,</span> <span class="n">control_estado</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">con5</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_id</span><span class="p">,</span> <span class="n">control_id</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">con6</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">con0</span> <span class="o">&amp;</span> <span class="n">con1</span> <span class="o">&amp;</span> <span class="n">con2</span> <span class="o">&amp;</span> <span class="n">con3</span> <span class="o">&amp;</span> <span class="n">con4</span> <span class="o">&amp;</span> <span class="n">con5</span> <span class="o">&amp;</span> <span class="n">con6</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="Api"><a class="viewcode-back" href="../modelo.html#modelo.Api">[documentos]</a><span class="k">class</span> <span class="nc">Api</span><span class="p">(</span><span class="n">Database</span><span class="p">,</span> <span class="n">LogicaInterna</span><span class="p">):</span>
+<div class="viewcode-block" id="Api.agregar_libro"><a class="viewcode-back" href="../modelo.html#modelo.Api.agregar_libro">[documentos]</a>    <span class="k">def</span> <span class="nf">agregar_libro</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span><span class="p">,</span> <span class="n">mensaje_error</span><span class="p">,</span> <span class="n">tree</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ejecuta instrucciones de alta al clickar el botón &#39;Añadir&#39;. Luego, limpia y actualiza el treeview. En caso de datos inválidos, lanza mensaje de error.</span>
+
+<span class="sd">        :param id: Stringvar. Variable de control con datos del ID del libro.</span>
+<span class="sd">        :param nombre: Stringvar. Variable de control con datos del nombre del libro.</span>
+<span class="sd">        :param autor: Stringvar. Variable de control con datos del autor del libro.</span>
+<span class="sd">        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.</span>
+<span class="sd">        :param año: Stringvar. Variable de control con datos del año de publicación del libro.</span>
+<span class="sd">        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.</span>
+<span class="sd">        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.</span>
+<span class="sd">        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.</span>
+<span class="sd">        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validar_entradas</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">alta_db</span><span class="p">(</span>
+                <span class="n">nombre</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="n">autor</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="n">editorial</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="n">año</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="n">categoria</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="n">estado</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+            <span class="p">)</span>
+            <span class="n">showinfo</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Aviso&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Su libro fue cargado correctamente&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">limpiar_y_armar</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blanquear_entradas</span><span class="p">(</span>
+                <span class="nb">id</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">showerror</span><span class="p">(</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error de campos inválidos&quot;</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Controle que todos los campos contengan datos válidos&quot;</span>
+                <span class="o">+</span> <span class="n">mensaje_error</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Api.eliminar_libro"><a class="viewcode-back" href="../modelo.html#modelo.Api.eliminar_libro">[documentos]</a>    <span class="k">def</span> <span class="nf">eliminar_libro</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span><span class="p">,</span> <span class="n">mensaje_error</span><span class="p">,</span> <span class="n">tree</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ejecuta instrucciones de baja al clickar el botón &#39;Eliminar&#39;. Luego, limpia y actualiza el treeview.</span>
+
+<span class="sd">        :param id: Stringvar. Variable de control con datos del ID del libro.</span>
+<span class="sd">        :param nombre: Stringvar. Variable de control con datos del nombre del libro.</span>
+<span class="sd">        :param autor: Stringvar. Variable de control con datos del autor del libro.</span>
+<span class="sd">        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.</span>
+<span class="sd">        :param año: Stringvar. Variable de control con datos del año de publicación del libro.</span>
+<span class="sd">        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.</span>
+<span class="sd">        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.</span>
+<span class="sd">        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.</span>
+<span class="sd">        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">patron_id</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;\d+&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">patron_id</span><span class="p">,</span> <span class="nb">id</span><span class="o">.</span><span class="n">get</span><span class="p">())</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">askyesno</span><span class="p">(</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Confirmación&quot;</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;¿Realmente desea eliminar este libro?&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">answer</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">baja_db</span><span class="p">(</span><span class="nb">id</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+                <span class="n">showinfo</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Aviso&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Su libro fue eliminado correctamente&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">limpiar_y_armar</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">blanquear_entradas</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">showerror</span><span class="p">(</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error de ID&quot;</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;El ID ingresado no es válido para ejecutar la acción&quot;</span>
+                <span class="o">+</span> <span class="n">mensaje_error</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Api.modificar_libro"><a class="viewcode-back" href="../modelo.html#modelo.Api.modificar_libro">[documentos]</a>    <span class="k">def</span> <span class="nf">modificar_libro</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span><span class="p">,</span> <span class="n">mensaje_error</span><span class="p">,</span> <span class="n">tree</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ejecuta instrucciones de actualización al clickar el botón &#39;Modificar&#39;. Luego, limpia y actualiza el treeview. En caso de datos inválidos, lanza mensaje de error.</span>
+
+<span class="sd">        :param id: Stringvar. Variable de control con datos del ID del libro.</span>
+<span class="sd">        :param nombre: Stringvar. Variable de control con datos del nombre del libro.</span>
+<span class="sd">        :param autor: Stringvar. Variable de control con datos del autor del libro.</span>
+<span class="sd">        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.</span>
+<span class="sd">        :param año: Stringvar. Variable de control con datos del año de publicación del libro.</span>
+<span class="sd">        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.</span>
+<span class="sd">        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.</span>
+<span class="sd">        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.</span>
+<span class="sd">        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">validar_entradas</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span><span class="p">):</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="n">askyesno</span><span class="p">(</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Confirmación&quot;</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;¿Realmente desea modificar este libro?&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">answer</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modificar_db</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                    <span class="n">nombre</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                    <span class="n">autor</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                    <span class="n">editorial</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                    <span class="n">año</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                    <span class="n">categoria</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                    <span class="n">estado</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="p">)</span>
+                <span class="n">showinfo</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Aviso&quot;</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Su libro fue modificado correctamente&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">limpiar_y_armar</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">blanquear_entradas</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="p">,</span> <span class="n">nombre</span><span class="p">,</span> <span class="n">autor</span><span class="p">,</span> <span class="n">editorial</span><span class="p">,</span> <span class="n">año</span><span class="p">,</span> <span class="n">categoria</span><span class="p">,</span> <span class="n">estado</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">showerror</span><span class="p">(</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Error de campos inválidos&quot;</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="s2">&quot;Controle que todos los campos contengan datos válidos&quot;</span>
+                <span class="o">+</span> <span class="n">mensaje_error</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Api.consultar"><a class="viewcode-back" href="../modelo.html#modelo.Api.consultar">[documentos]</a>    <span class="k">def</span> <span class="nf">consultar</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">consulta</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">,</span>
+        <span class="n">nombre</span><span class="p">,</span>
+        <span class="n">autor</span><span class="p">,</span>
+        <span class="n">editorial</span><span class="p">,</span>
+        <span class="n">año</span><span class="p">,</span>
+        <span class="n">categoria</span><span class="p">,</span>
+        <span class="n">estado</span><span class="p">,</span>
+        <span class="n">mensaje_error</span><span class="p">,</span>
+        <span class="n">tree</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ejecuta instrucciones de consulta al clickar el botón &#39;Consultar&#39;. Luego, limpia y actualiza el treeview. En caso de datos inválidos, lanza mensaje de error.</span>
+
+<span class="sd">        :param id: Stringvar. Variable de control con datos del ID del libro.</span>
+<span class="sd">        :param nombre: Stringvar. Variable de control con datos del nombre del libro.</span>
+<span class="sd">        :param autor: Stringvar. Variable de control con datos del autor del libro.</span>
+<span class="sd">        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.</span>
+<span class="sd">        :param año: Stringvar. Variable de control con datos del año de publicación del libro.</span>
+<span class="sd">        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.</span>
+<span class="sd">        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.</span>
+<span class="sd">        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.</span>
+<span class="sd">        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">armar_consulta</span><span class="p">(</span>
+                <span class="n">consulta</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="nb">id</span><span class="p">,</span>
+                <span class="n">nombre</span><span class="p">,</span>
+                <span class="n">autor</span><span class="p">,</span>
+                <span class="n">editorial</span><span class="p">,</span>
+                <span class="n">año</span><span class="p">,</span>
+                <span class="n">categoria</span><span class="p">,</span>
+                <span class="n">estado</span><span class="p">,</span>
+                <span class="n">mensaje_error</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="o">!=</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">armar_consulta</span><span class="p">(</span>
+                <span class="n">consulta</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="nb">id</span><span class="p">,</span>
+                <span class="n">nombre</span><span class="p">,</span>
+                <span class="n">autor</span><span class="p">,</span>
+                <span class="n">editorial</span><span class="p">,</span>
+                <span class="n">año</span><span class="p">,</span>
+                <span class="n">categoria</span><span class="p">,</span>
+                <span class="n">estado</span><span class="p">,</span>
+                <span class="n">mensaje_error</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">limpiar_treeview</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">armar_treeview</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">sobre</span><span class="p">,</span> <span class="n">clausula</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2023, Simon Bierozko.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
