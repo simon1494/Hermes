@@ -25,8 +25,8 @@ if __name__ == "__main__":
 
     app = App(root)
 
-    app.crear_variables_control()
     app.crear_estilos_y_fuentes()
+    app.crear_variables_control()
     app.crear_labels()
     app.crear_entries()
     app.crear_botones()

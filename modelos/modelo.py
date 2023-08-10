@@ -3,7 +3,9 @@ import sys
 sys.path.append("../library")
 import re
 from modelos.operaciones_base import DatabaseOps
-from modelos.operaciones_data import DataOps
+from vista.operaciones_widgets import DataOps
+from modelos.registro_de_logs import registrar_log
+from modelos.cuadros_de_dialogo import mensaje_operacion
 
 
 """
@@ -12,10 +14,9 @@ modelo.py:
 """
 
 
-class Modelo(DatabaseOps, DataOps):
-    def agregar_libro(
-        self, id, nombre, autor, editorial, año, categoria, estado, mensaje_error, tree
-    ):
+class Modelo(DatabaseOps):
+    @registrar_log("alta")
+    def agregar_libro(self, variables_de_control, mensaje_error):
         """
         Ejecuta instrucciones de alta al clickar el botón 'Añadir'. Luego, limpia y actualiza el treeview. En caso de datos inválidos, lanza mensaje de error.
 
@@ -29,23 +30,13 @@ class Modelo(DatabaseOps, DataOps):
         :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
         :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
         """
+
         if self.validar_entradas(id, nombre, autor, editorial, año, categoria, estado):
-            self.alta_db(
-                nombre.get(),
-                autor.get(),
-                editorial.get(),
-                año.get(),
-                categoria.get(),
-                estado.get(),
-            )
-            self.mostrar_mensaje_info("Su libro fue cargado correctamente")
-            self.limpiar_y_armar(tree)
-            self.blanquear_entradas(
-                id, nombre, autor, editorial, año, categoria, estado
-            )
+            self.alta_db(nombre, autor, editorial, año, categoria, estado)
         else:
             self.mostrar_mensaje_error(f"{mensaje_error}")
 
+    @registrar_log("baja")
     def eliminar_libro(
         self, id, nombre, autor, editorial, año, categoria, estado, mensaje_error, tree
     ):
@@ -69,7 +60,6 @@ class Modelo(DatabaseOps, DataOps):
             )
             if answer:
                 self.baja_db(id.get())
-                self.mostrar_mensaje_info("Su libro fue eliminado correctamente")
                 self.limpiar_y_armar(tree)
                 self.blanquear_entradas(
                     id, nombre, autor, editorial, año, categoria, estado
@@ -79,6 +69,7 @@ class Modelo(DatabaseOps, DataOps):
                 f"El ID ingresado no es válido para ejecutar la acción.\n{mensaje_error}"
             )
 
+    @registrar_log("mod")
     def modificar_libro(
         self, id, nombre, autor, editorial, año, categoria, estado, mensaje_error, tree
     ):
@@ -109,7 +100,6 @@ class Modelo(DatabaseOps, DataOps):
                     categoria.get(),
                     estado.get(),
                 )
-                self.mostrar_mensaje_info("Su libro fue modificado correctamente")
                 self.limpiar_y_armar(tree)
                 self.blanquear_entradas(
                     id, nombre, autor, editorial, año, categoria, estado
@@ -119,6 +109,7 @@ class Modelo(DatabaseOps, DataOps):
                 f"Controle que todos los campos contengan datos válidos.\b{mensaje_error}"
             )
 
+    @registrar_log("con")
     def consultar(
         self,
         consulta,

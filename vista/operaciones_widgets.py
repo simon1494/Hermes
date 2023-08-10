@@ -2,57 +2,11 @@ import sys
 
 sys.path.append("../library")
 import re
-import tkinter as tk
-from modelos.estructura_base import Libro
 from modelos.cuadros_de_dialogo import Mensajes
 
 
-class DataOps(Mensajes):
-    def crear_variables_control(self):
-        """
-        Crea las variables de control utilizadas para manipular a través de la aplicación la información de los registros.
-        """
-
-        self.control_id = tk.StringVar()
-        self.control_nombre = tk.StringVar()
-        self.control_autor = tk.StringVar()
-        self.control_editorial = tk.StringVar()
-        self.control_anio = tk.StringVar()
-        self.control_categoria = tk.StringVar()
-        self.control_estado = tk.StringVar()
-        self.control_consulta = tk.StringVar()
-
-        self.variables_de_control = {
-            "id": self.control_id,
-            "nombre": self.control_nombre,
-            "autor": self.control_autor,
-            "editorial": self.control_editorial,
-            "año": self.control_anio,
-            "categoria": self.control_categoria,
-            "estado": self.control_estado,
-            "consulta": self.control_consulta,
-        }
-
-        self.control_id.set("")
-        self.control_nombre.set("")
-        self.control_autor.set("")
-        self.control_editorial.set("")
-        self.control_anio.set("")
-        self.control_categoria.set("")
-        self.control_estado.set("")
-        self.control_consulta.set("")
-
-    def seleccionar_item(
-        self,
-        tree,
-        id,
-        nombre,
-        autor,
-        editorial,
-        año,
-        categoria,
-        estado,
-    ):
+class WidgetOps(Mensajes):
+    def seleccionar_item(self, tree, variables_de_control):
         """
         Ejecuta un autocompletado de los campos del data entry al clickear sobre un item del treeview.
 
@@ -66,11 +20,19 @@ class DataOps(Mensajes):
         :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
         :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
         """
+
+        id = variables_de_control["id"]
+        nombre = variables_de_control["nombre"]
+        autor = variables_de_control["autor"]
+        editorial = variables_de_control["editorial"]
+        año = variables_de_control["año"]
+        categoria = variables_de_control["categoria"]
+        estado = variables_de_control["estado"]
+
         try:
             item_ = tree.focus()
-            selected = self._convertir_query(
-                Libro.select().where(Libro.id == tree.item(item_)["values"][0]), False
-            )
+            item_2 = tree.item(item_)["values"][0]
+            selected = self._convertir_query(item_2, False)
             self.blanquear_entradas(
                 id, nombre, autor, editorial, año, categoria, estado
             )
@@ -84,6 +46,8 @@ class DataOps(Mensajes):
         except IndexError:
             pass  # Pasa por alto el error en consola que ocurre al clickear en un espacio no valido del Treeview
 
+    # limpiar y armar el tree debería ser una operacion de update que triggerea el Sujeto.
+    #####################################################################################
     def limpiar_y_armar(self, tree):
         """
         Blanquea y rearma el Treeview de nuestra aplicación.
@@ -126,61 +90,60 @@ class DataOps(Mensajes):
                 ),
             )
 
-    def blanquear_entradas(
-        self,
-        control_id,
-        control_nombre,
-        control_autor,
-        control_editorial,
-        control_año,
-        control_categoria,
-        control_estado,
-    ):
+    #####################################################################################
+
+    def blanquear_entradas(self, variables_de_control):
         """
         Realiza un blanqueo de todos los data entry de nuestra aplicación.
 
-        :param control_id: Stringvar. Variable de control con datos del ID del libro.
-        :param control_nombre: Stringvar. Variable de control con datos del nombre del libro.
-        :param control_autor: Stringvar. Variable de control con datos del autor del libro.
-        :param control_editorial: Stringvar. Variable de control con datos de la editorial del libro.
-        :param control_año: Stringvar. Variable de control con datos del año de publicación del libro.
-        :param control_categoria: Stringvar. Variable de control con datos de la categoría del libro.
-        :param control_estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        :param id: Stringvar. Variable de control con datos del ID del libro.
+        :param nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param autor: Stringvar. Variable de control con datos del autor del libro.
+        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.
         """
-        control_id.set("")
-        control_nombre.set("")
-        control_autor.set("")
-        control_editorial.set("")
-        control_año.set("")
-        control_categoria.set("")
-        control_estado.set("")
+        id = variables_de_control["id"]
+        nombre = variables_de_control["nombre"]
+        autor = variables_de_control["autor"]
+        editorial = variables_de_control["editorial"]
+        año = variables_de_control["año"]
+        categoria = variables_de_control["categoria"]
+        estado = variables_de_control["estado"]
 
-    def armar_consulta(
-        self,
-        y,
-        control_id,
-        control_nombre,
-        control_autor,
-        control_editorial,
-        control_año,
-        control_categoria,
-        control_estado,
-        mensaje_error,
-    ):
+        id.set("")
+        nombre.set("")
+        autor.set("")
+        editorial.set("")
+        año.set("")
+        categoria.set("")
+        estado.set("")
+
+    def armar_consulta(self, y, variables_de_control, mensaje_error):
         """
         Comprueba la validez de la expresión del campo solicitado en la búsqueda del usuario y lo convierte a un formato adecuado para realizar una consulta por ORM. En vaso de consulta inválida, lanza mensaje de error.
 
         :param y: String. Representa una elección realizada por el usuario sobre qué tipo de consulta realizar.
-        :param control_id: Stringvar. Variable de control con datos del ID del libro.
-        :param control_nombre: Stringvar. Variable de control con datos del nombre del libro.
-        :param control_autor: Stringvar. Variable de control con datos del autor del libro.
-        :param control_editorial: Stringvar. Variable de control con datos de la editorial del libro.
-        :param control_año: Stringvar. Variable de control con datos del año de publicación del libro.
-        :param control_categoria: Stringvar. Variable de control con datos de la categoría del libro.
-        :param control_estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        :param id: Stringvar. Variable de control con datos del ID del libro.
+        :param nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param autor: Stringvar. Variable de control con datos del autor del libro.
+        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.
         :mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
         :return: Campo de la base (String) y clausula de la consulta a realizar (String).
         """
+
+        id = variables_de_control["id"]
+        nombre = variables_de_control["nombre"]
+        autor = variables_de_control["autor"]
+        editorial = variables_de_control["editorial"]
+        año = variables_de_control["año"]
+        categoria = variables_de_control["categoria"]
+        estado = variables_de_control["estado"]
+
         patron_id = re.compile("\d+")
         patron_nombre = re.compile("[a-z0-9\sáéíóúñ]+", flags=re.I)
         patron_autor = re.compile("[a-záéíóúñ\s]+", flags=re.I)
@@ -194,89 +157,89 @@ class DataOps(Mensajes):
         match y:
             case "Ver todo":
                 self.blanquear_entradas(
-                    control_id,
-                    control_nombre,
-                    control_autor,
-                    control_editorial,
-                    control_año,
-                    control_categoria,
-                    control_estado,
+                    id,
+                    nombre,
+                    autor,
+                    editorial,
+                    año,
+                    categoria,
+                    estado,
                 )
                 sobre = "Ver todo"
                 clausula = None
                 return sobre, clausula
             case "Buscar id":
-                if re.fullmatch(patron_id, control_id.get()) == None:
+                if re.fullmatch(patron_id, id.get()) == None:
                     self.mostrar_mensaje_error(f"{mensaje_error}")
                 else:
                     sobre = "Buscar id"
-                    clausula = control_id.get()
+                    clausula = id.get()
                     return sobre, clausula
             case "Buscar nombre":
-                if re.fullmatch(patron_nombre, control_nombre.get()) == None:
+                if re.fullmatch(patron_nombre, nombre.get()) == None:
                     self.mostrar_mensaje_error(f"{mensaje_error}")
                 else:
                     sobre = "Buscar nombre"
-                    clausula = control_nombre.get()
+                    clausula = nombre.get()
                     return sobre, clausula
             case "Buscar autor":
-                if re.fullmatch(patron_autor, control_autor.get()) == None:
+                if re.fullmatch(patron_autor, autor.get()) == None:
                     self.mostrar_mensaje_error(f"{mensaje_error}")
                 else:
                     sobre = "Buscar autor"
-                    clausula = control_autor.get()
+                    clausula = autor.get()
                     return sobre, clausula
             case "Buscar editorial":
-                if re.fullmatch(patron_editorial, control_editorial.get()) == None:
+                if re.fullmatch(patron_editorial, editorial.get()) == None:
                     self.mostrar_mensaje_error(f"{mensaje_error}")
                 else:
                     sobre = "Buscar editorial"
-                    clausula = control_editorial.get()
+                    clausula = editorial.get()
                     return sobre, clausula
             case "Buscar año":
-                if re.fullmatch(patron_año, control_año.get()) == None:
+                if re.fullmatch(patron_año, año.get()) == None:
                     self.mostrar_mensaje_error(f"{mensaje_error}")
                 else:
                     sobre = "Buscar año"
-                    clausula = control_año.get()
+                    clausula = año.get()
                     return sobre, clausula
             case "Buscar categoria":
-                if re.fullmatch(patron_categoria, control_categoria.get()) == None:
+                if re.fullmatch(patron_categoria, categoria.get()) == None:
                     self.mostrar_mensaje_error(f"{mensaje_error}")
                 else:
                     sobre = "Buscar categoria"
-                    clausula = control_categoria.get()
+                    clausula = categoria.get()
                     return sobre, clausula
             case "Buscar estado":
-                if re.fullmatch(patron_estado, control_estado.get()) == None:
+                if re.fullmatch(patron_estado, estado.get()) == None:
                     self.mostrar_mensaje_error(f"{mensaje_error}")
                 else:
                     sobre = "Buscar estado"
-                    clausula = control_estado.get()
+                    clausula = estado.get()
                     return sobre, clausula
 
-    def validar_entradas(
-        self,
-        control_id,
-        control_nombre,
-        control_autor,
-        control_editorial,
-        control_año,
-        control_categoria,
-        control_estado,
-    ):
+    def validar_entradas(self, variables_de_control):
         """
         Comprueba la validez de las expresiones en todos los campos del data entry.
 
-        :param control_id: Stringvar. Variable de control con datos del ID del libro.
-        :param control_nombre: Stringvar. Variable de control con datos del nombre del libro.
-        :param control_autor: Stringvar. Variable de control con datos del autor del libro.
-        :param control_editorial: Stringvar. Variable de control con datos de la editorial del libro.
-        :param control_año: Stringvar. Variable de control con datos del año de publicación del libro.
-        :param control_categoria: Stringvar. Variable de control con datos de la categoría del libro.
-        :param control_estado: Stringvar. Variable de control con datos del estado de existencia del libro.
+        :param id: Stringvar. Variable de control con datos del ID del libro.
+        :param nombre: Stringvar. Variable de control con datos del nombre del libro.
+        :param autor: Stringvar. Variable de control con datos del autor del libro.
+        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.
+        :param año: Stringvar. Variable de control con datos del año de publicación del libro.
+        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.
+        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.
         :return: True si la consulta es válida o False en caso contrario.
         """
+
+        id = variables_de_control["id"]
+        nombre = variables_de_control["nombre"]
+        autor = variables_de_control["autor"]
+        editorial = variables_de_control["editorial"]
+        año = variables_de_control["año"]
+        categoria = variables_de_control["categoria"]
+        estado = variables_de_control["estado"]
+
         patron_id = re.compile("\d*")
         patron_nombre = re.compile("[a-z0-9\sáéíóúñ]+", flags=re.I)
         patron_autor = re.compile("[a-záéíñóú\s]+", flags=re.I)
@@ -295,19 +258,19 @@ class DataOps(Mensajes):
         con5 = False
         con6 = False
 
-        if re.fullmatch(patron_nombre, control_nombre.get()) != None:
+        if re.fullmatch(patron_nombre, nombre.get()) != None:
             con0 = True
-        if re.fullmatch(patron_autor, control_autor.get()) != None:
+        if re.fullmatch(patron_autor, autor.get()) != None:
             con1 = True
-        if re.fullmatch(patron_editorial, control_editorial.get()) != None:
+        if re.fullmatch(patron_editorial, editorial.get()) != None:
             con2 = True
-        if re.fullmatch(patron_año, control_año.get()) != None:
+        if re.fullmatch(patron_año, año.get()) != None:
             con3 = True
-        if re.fullmatch(patron_categoria, control_categoria.get()) != None:
+        if re.fullmatch(patron_categoria, categoria.get()) != None:
             con4 = True
-        if re.fullmatch(patron_estado, control_estado.get()) != None:
+        if re.fullmatch(patron_estado, estado.get()) != None:
             con5 = True
-        if re.fullmatch(patron_id, control_id.get()) != None:
+        if re.fullmatch(patron_id, id.get()) != None:
             con6 = True
 
         if con0 & con1 & con2 & con3 & con4 & con5 & con6:

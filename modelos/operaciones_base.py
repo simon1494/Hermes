@@ -2,26 +2,29 @@ import sys
 
 sys.path.append("../library")
 import pandas as pd
-from modelos.estructura_base import DB
+from modelos.patron_observador import Sujeto
 from modelos.estructura_base import Libro
 from modelos.cuadros_de_dialogo import Mensajes
+from modelos.cuadros_de_dialogo import mensaje_operacion
 
 
-class DatabaseOps(Mensajes):
+class DatabaseOps(Mensajes, Sujeto):
+    def __init__(self, base_de_datos):
+        self.db = base_de_datos
+
     @classmethod
-    def crear_db(cls):
+    def crear_db(self):
         """
         Crea una base de datos donde se almacenará la información de nuestra aplicación. La función se ejecuta cada vez que la aplicación es abierta, pero en el caso de que ya exista una base creada, entonces no tendrá ningún efecto.
         """
         try:
-            DB.connect()
-            DB.create_tables([Libro])
+            self.db.connect()
+            self.db.create_tables([Libro])
         except Exception as error:
-            cls.mostrar_mensaje_error(f"Error creando base de datos: {error}")
-
-
+            self.db.mostrar_mensaje_error(f"Error creando base de datos: {error}")
 
     @staticmethod
+    # @mensaje_operacion("alta")
     def alta_db(nombre, autor, editorial, año, categoria, estado):
         """
         Genera el alta de un registro en la base de datos de nuestra aplicación.
@@ -43,6 +46,7 @@ class DatabaseOps(Mensajes):
         libro.save()
 
     @staticmethod
+    @mensaje_operacion("baja")
     def baja_db(id):
         """
         Genera la baja de un registro en la base de datos de nuestra aplicación.
@@ -52,6 +56,7 @@ class DatabaseOps(Mensajes):
         registro.delete_instance()
 
     @staticmethod
+    @mensaje_operacion("modificacion")
     def modificar_db(id, nombre, autor, editorial, año, categoria, estado):
         """
         Actualiza los campos de un registro existente en la base de datos de nuestra aplicación.
@@ -108,7 +113,7 @@ class DatabaseOps(Mensajes):
         return final
 
     @staticmethod
-    def _convertir_query(resultado, df):
+    def _convertir_query(item, df):
         """
         Convierte el resultado de una consulta a base en dataframe o lista según corresponda.
 
@@ -116,6 +121,8 @@ class DatabaseOps(Mensajes):
         :param df: Booleano. Seteado en True convierte el resultado en dataframe; de lo contrario, lista.
         :return: Dataframe o lista. Resultado de la consulta a base convertido en formato conveniente.
         """
+
+        resultado = Libro.select().where(Libro.id.get == item)
         final = []
         for registro in resultado:
             final.append(

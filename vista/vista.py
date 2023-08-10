@@ -10,14 +10,15 @@ from vista.modelos_vista import VentanaConfig
 from vista.modelos_vista import Boton
 from vista.modelos_vista import Etiqueta
 from vista.modelos_vista import EntradaTexto
+from vista.operaciones_widgets import WidgetOps
 
 """
-VIsta:
+Vista:
     Administra la interfaz de nuestra aplicación. 
 """
 
 
-class App(Modelo, VentanaConfig):
+class App(Modelo, VentanaConfig, WidgetOps):
     """
     Estructura la interfaz gráfica, a la vez que incorpora todas las funcionalidades y lógica interna del programa, así como tambien conexión con la base de datos, al heredar de la clase model.Api
     """
@@ -26,6 +27,40 @@ class App(Modelo, VentanaConfig):
         self.ventana = win
         self.ventana.title("Proyecto Hermes")
         self.ventana.geometry(self.centrar_ventana(700, 750))
+
+    def crear_variables_control(self):
+        """
+        Crea las variables de control utilizadas para manipular a través de la aplicación la información de los registros.
+        """
+
+        self.control_id = tk.StringVar()
+        self.control_nombre = tk.StringVar()
+        self.control_autor = tk.StringVar()
+        self.control_editorial = tk.StringVar()
+        self.control_anio = tk.StringVar()
+        self.control_categoria = tk.StringVar()
+        self.control_estado = tk.StringVar()
+        self.control_consulta = tk.StringVar()
+
+        self.variables_de_control = {
+            "id": self.control_id,
+            "nombre": self.control_nombre,
+            "autor": self.control_autor,
+            "editorial": self.control_editorial,
+            "año": self.control_anio,
+            "categoria": self.control_categoria,
+            "estado": self.control_estado,
+            "consulta": self.control_consulta,
+        }
+
+        self.control_id.set("")
+        self.control_nombre.set("")
+        self.control_autor.set("")
+        self.control_editorial.set("")
+        self.control_anio.set("")
+        self.control_categoria.set("")
+        self.control_estado.set("")
+        self.control_consulta.set("")
 
     def crear_estilos_y_fuentes(self):
         """Crea estilos y fuentes utilizados por la interfaz gráfica"""
@@ -62,7 +97,7 @@ class App(Modelo, VentanaConfig):
             self.ventana, text="Editorial", font=self.FUENTE, style="TLabel"
         )
         self.lb_anio = Etiqueta(
-            self.ventana, text="anio publicación", font=self.FUENTE, style="TLabel"
+            self.ventana, text="Año de publicación", font=self.FUENTE, style="TLabel"
         )
         self.lb_categoria = Etiqueta(
             self.ventana, text="Categoría", font=self.FUENTE, style="TLabel"
@@ -151,17 +186,7 @@ class App(Modelo, VentanaConfig):
             master=self.ventana,
             text="Añadir",
             background="#22DB68",
-            command=lambda: self.agregar_libro(
-                self.control_id,
-                self.control_nombre,
-                self.control_autor,
-                self.control_editorial,
-                self.control_anio,
-                self.control_categoria,
-                self.control_estado,
-                self.MENSAJE_DE_ERROR,
-                self.tree,
-            ),
+            command=lambda: self.alta(),
         )
         self.bt_eliminar = Boton(
             master=self.ventana,
@@ -248,6 +273,32 @@ class App(Modelo, VentanaConfig):
             ),
         )
         self.armar_treeview(self.tree)
+
+    def alta(self):
+        if self.validar_entradas(self.variables_de_control):
+            self.agregar_libro(
+                self.variables_de_control,
+                self.MENSAJE_DE_ERROR,
+            )
+            self.limpiar_y_armar(self.tree)
+            self.blanquear_entradas(self.variables_de_control)
+        else:
+            ...
+
+    def baja(
+        self,
+    ):
+        ...
+
+    def modificacion(
+        self,
+    ):
+        ...
+
+    def consulta(
+        self,
+    ):
+        ...
 
     def correr(self):
         """Inicia el loop de nuestra interfaz gráfica."""
