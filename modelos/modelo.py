@@ -15,28 +15,7 @@ modelo.py:
 
 
 class Modelo(DatabaseOps):
-    @registrar_log("alta")
-    def agregar_libro(self, variables_de_control, mensaje_error):
-        """
-        Ejecuta instrucciones de alta al clickar el botón 'Añadir'. Luego, limpia y actualiza el treeview. En caso de datos inválidos, lanza mensaje de error.
-
-        :param id: Stringvar. Variable de control con datos del ID del libro.
-        :param nombre: Stringvar. Variable de control con datos del nombre del libro.
-        :param autor: Stringvar. Variable de control con datos del autor del libro.
-        :param editorial: Stringvar. Variable de control con datos de la editorial del libro.
-        :param año: Stringvar. Variable de control con datos del año de publicación del libro.
-        :param categoria: Stringvar. Variable de control con datos de la categoría del libro.
-        :param estado: Stringvar. Variable de control con datos del estado de existencia del libro.
-        :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
-        :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
-        """
-
-        if self.validar_entradas(id, nombre, autor, editorial, año, categoria, estado):
-            self.alta_db(nombre, autor, editorial, año, categoria, estado)
-        else:
-            self.mostrar_mensaje_error(f"{mensaje_error}")
-
-    @registrar_log("baja")
+    
     def eliminar_libro(
         self, id, nombre, autor, editorial, año, categoria, estado, mensaje_error, tree
     ):
@@ -53,8 +32,8 @@ class Modelo(DatabaseOps):
         :param mensaje_error: String. Mensaje de error a mostrar en caso de consulta inválida.
         :param tree: Objeto de clase Treeview. Representa el treeview de nuestra aplicación.
         """
-        patron_id = re.compile("\d+")
-        if re.fullmatch(patron_id, id.get()) != None:
+        patron_id = 
+        if re.fullmatch(re.compile("\d+"), id.get()) != None:
             answer = self.mostrar_pregunta_si_o_no(
                 "¿Realmente desea eliminar este libro?"
             )

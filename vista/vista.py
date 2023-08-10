@@ -5,7 +5,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
 from tkinter.ttk import Style
-from modelos.modelo import Modelo
+
+from modelos.patron_observador import ObservadorABS
 from vista.modelos_vista import VentanaConfig
 from vista.modelos_vista import Boton
 from vista.modelos_vista import Etiqueta
@@ -18,15 +19,19 @@ Vista:
 """
 
 
-class App(Modelo, VentanaConfig, WidgetOps):
+class App(VentanaConfig, WidgetOps, ObservadorABS):
     """
     Estructura la interfaz gráfica, a la vez que incorpora todas las funcionalidades y lógica interna del programa, así como tambien conexión con la base de datos, al heredar de la clase model.Api
     """
 
-    def __init__(self, win):
+    def __init__(self, win, objeto_observado):
         self.ventana = win
         self.ventana.title("Proyecto Hermes")
         self.ventana.geometry(self.centrar_ventana(700, 750))
+
+        # Agrego la VISTA al listado de observadores del MODELO
+        self.objeto_observado = objeto_observado
+        self.objeto_observado.agregar(self)
 
     def crear_variables_control(self):
         """
@@ -239,21 +244,31 @@ class App(Modelo, VentanaConfig, WidgetOps):
 
     def alta(self):
         if self.validar_entradas(self.variables_de_control):
+<<<<<<< Updated upstream
             self.agregar_libro(self.variables_de_control)
+=======
+            self.objeto_observado.agregar_libro(
+                self.variables_de_control,
+                self.MENSAJE_DE_ERROR,
+            )
+            self.limpiar_y_armar(self.tree)
+            self.blanquear_entradas(self.variables_de_control)
+>>>>>>> Stashed changes
         else:
             ...
 
     def baja(self):
+<<<<<<< Updated upstream
+=======
+        if self.mostrar_pregunta_si_o_no("¿Realmente desea eliminar este libro?"):
+            if self.validar_id(self.control_id):
+                self.objeto_observado.baja()
+
+    def modificacion(self):
+>>>>>>> Stashed changes
         ...
 
-    def modificacion(
-        self,
-    ):
-        ...
-
-    def consulta(
-        self,
-    ):
+    def consulta(self):
         ...
 
     def correr(self):

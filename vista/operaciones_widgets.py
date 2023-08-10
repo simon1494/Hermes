@@ -277,3 +277,6 @@ class WidgetOps(Mensajes):
             return True
         else:
             return False
+
+    def validar_id(self, id):
+        return re.fullmatch(re.compile("\d+"), id.get()) != None

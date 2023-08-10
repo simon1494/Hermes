@@ -2,6 +2,25 @@
 Controlador:
     Administra el flujo de ejecución principal de nuestra aplicación. 
 """
+
+
+class Controlador:
+    def __init__(self, modelo):
+        self.modelo = modelo
+
+    def dar_de_alta(self):
+        self.modelo.alta_db()
+
+    def da_de_baja(self):
+        self.modelo.baja_db()
+
+    def modificar(self):
+        self.modelo.modificar_db()
+
+    def consultar(self):
+        self.modelo.consultar_db()
+
+
 if __name__ == "__main__":
     import sys
 

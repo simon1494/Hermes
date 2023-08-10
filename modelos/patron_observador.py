@@ -4,27 +4,17 @@ from modelos.registro_de_logs import Logueador
 class Sujeto:
     observadores = []
 
-    def agregar(self, observador):
+    def agregar_observador(self, observador):
         self.observadores.append(observador)
 
-    def eliminar(self, observador):
+    def eliminar_observador(self, observador):
         self.observadores.pop(observador)
 
-    def notificar_operacion_en_base(self, tipo_de_operacion):
+    def notificar_a_observadores(self):
         for observador in self.observadores:
-            observador.notificarse(tipo_de_operacion)
+            observador.darse_por_notificado()
 
 
 class ObservadorABS:
-    def notificarse(self, tipo_de_operacion):
+    def darse_por_notificado(self):
         raise NotImplementedError("Método 'darse_por_notificado()' no implementado")
-
-
-class ObservadorIMP(ObservadorABS, Logueador):
-    def __init__(self, objeto_observado):
-        self.objeto_observado = objeto_observado
-        self.objeto_observado.agregar(self)
-
-    def notificarse(self, tipo_de_operacion):
-        logger = Logueador()
-        logger.loguear(tipo_de_operacion)
