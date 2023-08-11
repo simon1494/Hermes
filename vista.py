@@ -158,11 +158,13 @@ class Vista(VentanaConfig, WidgetOps, ObservadorABS):
             self.ventana,
             textvariable=self.control_categoria,
             values=("Ficción", "Ensayo", "Poesía", "Filosofía", "Sociología", "Otros"),
+            state="readonly",
         )
         self.box_estado = ttk.Combobox(
             self.ventana,
             textvariable=self.control_estado,
             values=("En Biblioteca", "Prestado"),
+            state="readonly",
         )
         self.box_consulta = ttk.Combobox(
             self.ventana,
