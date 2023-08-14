@@ -10,7 +10,7 @@ class Requesteador(BaseRequestHandler):
         self.responder_a_cliente()
 
     def recibir_paquete_y_generar_atributos_de_instancia(self):
-        print("Recibiendo paquete...")
+        # print("Recibiendo paquete...")
         self.data_recibida = loads(self.request[0])
         self.tipo_de_operacion = self.data_recibida[0]
         self.datos_de_la_operacion = self.data_recibida[1]
@@ -19,7 +19,7 @@ class Requesteador(BaseRequestHandler):
         self.preparar_respuesta()
 
     def preparar_respuesta(self):
-        print("Preparando respuesta...")
+        # print("Preparando respuesta...")
         a = self.estampa_temporal_de_operacion
         b = self.elegir_respuesta_segun_operacion()
         c = self.datos_de_la_operacion
@@ -36,9 +36,9 @@ class Requesteador(BaseRequestHandler):
             return "Se procesó operacion de consulta"
 
     def procesar_paquete_del_cliente(self):
-        print("Procesando paquete...")
+        # print("Procesando paquete...")
         print(self.data_recibida[1])
 
     def responder_a_cliente(self):
         self.socket.sendto(self.respuesta.encode("UTF-8"), self.client_address)
-        print("Respuesta enviada")
+        # print("Respuesta enviada")

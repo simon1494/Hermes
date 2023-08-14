@@ -46,7 +46,9 @@ class Modelo(Mensajes, Sujeto):
         libro.categoria = categoria
         libro.estado = estado
         libro.save()
-        self._enviar_info_a_servidor("alta", rf"{nombre} // {autor} // {editorial}")
+        self._enviar_info_a_servidor(
+            "alta", rf"ALTA ---{nombre} // {autor} // {editorial}"
+        )
         self.notificar_a_observadores()
 
     @mensaje_operacion("baja")
@@ -57,7 +59,7 @@ class Modelo(Mensajes, Sujeto):
         :param id: Integer. ID del libro que se desea eliminar."""
         registro = Libro.get(Libro.id == id)
         registro.delete_instance()
-        self._enviar_info_a_servidor("baja", rf"Id de la baja: {id}")
+        self._enviar_info_a_servidor("baja", rf"BAJA --- Id de la baja: {id}")
         self.notificar_a_observadores()
 
     @mensaje_operacion("mod")
@@ -84,7 +86,7 @@ class Modelo(Mensajes, Sujeto):
         registro.execute()
         self._enviar_info_a_servidor(
             "modificacion",
-            rf"Id de la modificacion: {id} --- Datos modificados: {nombre} // {autor} // {editorial} [...]",
+            rf"Id de la modificacion: MODIFICACION ---ID :{id} --- Datos modificados: {nombre} // {autor} // {editorial} [...]",
         )
         self.notificar_a_observadores()
 
@@ -119,10 +121,11 @@ class Modelo(Mensajes, Sujeto):
         # Crear el DataFrame a partir de la lista de datos de las filas
         final = self._convertir_query(resultado, df, item)
 
-        self._enviar_info_a_servidor(
-            "consulta",
-            f"Se ha ejecutado una consulta sobre: {sobre}",
-        )
+        if sobre != None:
+            self._enviar_info_a_servidor(
+                "consulta",
+                f"CONSULTA --- categoría: {sobre} // Cláusula: {clausula}",
+            )
 
         return final
 
