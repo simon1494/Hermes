@@ -73,7 +73,6 @@ class Modelo(Mensajes, Sujeto):
         :param categoria: String. Categoría a la que pertenece el libro.
         :param estado: String. Estado de existencia del libro en la biblioteca.
         """
-        print("entre")
         registro = Libro.update(
             nombre=nombre,
             autor=autor,
