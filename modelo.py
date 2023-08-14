@@ -2,6 +2,7 @@ import sys
 
 sys.path.append("../library")
 import pandas as pd
+from servidor.cliente import Cliente
 from clases.patron_observador import Sujeto
 from clases.estructura_base import Libro
 from clases.cuadros_de_dialogo import Mensajes
@@ -9,9 +10,11 @@ from clases.cuadros_de_dialogo import mensaje_operacion
 
 
 class Modelo(Mensajes, Sujeto):
-    def __init__(self, base_de_datos):
+    def __init__(self, base_de_datos, datos_servidor):
         self.db = base_de_datos
         self.crear_db()
+        self.HOST = datos_servidor[0]
+        self.PORT = datos_servidor[1]
 
     def crear_db(self):
         """
@@ -43,6 +46,7 @@ class Modelo(Mensajes, Sujeto):
         libro.categoria = categoria
         libro.estado = estado
         libro.save()
+        self._enviar_info_a_servidor("alta", rf"{nombre} // {autor} // {editorial}")
         self.notificar_a_observadores()
 
     @mensaje_operacion("baja")
@@ -53,6 +57,7 @@ class Modelo(Mensajes, Sujeto):
         :param id: Integer. ID del libro que se desea eliminar."""
         registro = Libro.get(Libro.id == id)
         registro.delete_instance()
+        self._enviar_info_a_servidor("baja", rf"Id de la baja: {id}")
         self.notificar_a_observadores()
 
     @mensaje_operacion("mod")
@@ -78,6 +83,10 @@ class Modelo(Mensajes, Sujeto):
             estado=estado,
         ).where(Libro.id == id)
         registro.execute()
+        self._enviar_info_a_servidor(
+            "modificacion",
+            rf"Id de la modificacion: {id} --- Datos modificados: {nombre} // {autor} // {editorial} [...]",
+        )
         self.notificar_a_observadores()
 
     def consultar_db(self, sobre, clausula, df, item):
@@ -110,6 +119,11 @@ class Modelo(Mensajes, Sujeto):
 
         # Crear el DataFrame a partir de la lista de datos de las filas
         final = self._convertir_query(resultado, df, item)
+
+        self._enviar_info_a_servidor(
+            "consulta",
+            f"Se ha ejecutado una consulta sobre: {sobre}",
+        )
 
         return final
 
@@ -181,3 +195,7 @@ class Modelo(Mensajes, Sujeto):
                     ],
                 )
             return final
+
+    def _enviar_info_a_servidor(self, tipo_operacion, data):
+        cliente = Cliente(self.HOST, self.PORT)
+        cliente.enviar_info_y_procesar_respuesta(tipo_operacion, data)

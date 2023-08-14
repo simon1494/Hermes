@@ -14,12 +14,15 @@ if __name__ == "__main__":
     def lanzar_inicio():
         logueo = LogoInicio()
 
+    HOST = "localhost"
+    PORT = 9999
+
     hilo_inicio = threading.Thread(target=lanzar_inicio)
     hilo_inicio.start()
     hilo_inicio.join()
 
     root = Tk()
 
-    modelo = Modelo(DB)
+    modelo = Modelo(DB, (HOST, PORT))
     controlador = Controlador(modelo)
     vista = Vista(root, controlador)
