@@ -248,6 +248,10 @@ class Vista(VentanaConfig, WidgetOps, ObservadorABS):
     def alta(self):
         if self.validar_entradas(self.variables_de_control):
             self.objeto_observado.alta(self.variables_de_control)
+        else:
+            self.mostrar_mensaje_advertencia(
+                f"Controle que todos los campos contengan datos válidos."
+            )
 
     def baja(self):
         if self.mostrar_pregunta_si_o_no("¿Realmente desea eliminar este libro?"):
@@ -268,11 +272,16 @@ class Vista(VentanaConfig, WidgetOps, ObservadorABS):
                 )
 
     def consultar(self):
-        sobre, clausula = self.armar_consulta(
-            self.variables_de_control, self.MENSAJE_DE_ERROR
-        )
-        self.limpiar_treeview(self.tree)
-        self.armar_treeview(self.tree, sobre, clausula)
+        if self.validar_entradas(self.variables_de_control):
+            sobre, clausula = self.armar_consulta(
+                self.variables_de_control, self.MENSAJE_DE_ERROR
+            )
+            self.limpiar_treeview(self.tree)
+            self.armar_treeview(self.tree, sobre, clausula)
+        else:
+            self.mostrar_mensaje_advertencia(
+                f"Controle que todos los campos contengan datos válidos"
+            )
 
     def notificarse(self):
         self.limpiar_y_armar(self.tree)
