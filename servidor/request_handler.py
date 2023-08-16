@@ -1,6 +1,7 @@
 from socketserver import BaseRequestHandler
 from datetime import datetime
 from pickle import loads
+from logger import Logger
 
 
 class Requesteador(BaseRequestHandler):
@@ -15,7 +16,9 @@ class Requesteador(BaseRequestHandler):
         self.tipo_de_operacion = self.data_recibida[0]
         self.datos_de_la_operacion = self.data_recibida[1]
         self.socket = self.request[1]
-        self.estampa_temporal_de_operacion = datetime.now().strftime("%Y/%m/%d")
+        self.estampa_temporal_de_operacion = datetime.now().strftime(
+            "%Y/%m/%d %H:%M:%S"
+        )
         self.preparar_respuesta()
 
     def preparar_respuesta(self):
@@ -38,6 +41,8 @@ class Requesteador(BaseRequestHandler):
     def procesar_paquete_del_cliente(self):
         # print("Procesando paquete...")
         print(self.data_recibida[1])
+        logger = Logger()
+        logger.log(f"{self.estampa_temporal_de_operacion} --- {self.data_recibida[1]}")
 
     def responder_a_cliente(self):
         self.socket.sendto(self.respuesta.encode("UTF-8"), self.client_address)
