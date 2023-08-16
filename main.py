@@ -19,7 +19,7 @@ if __name__ == "__main__":
         SERVIDOR = subprocess.Popen(
             [
                 sys.executable,
-                rf"{ruta_servidor}\controlador_servidor.py",
+                rf"{ruta_servidor}\servidor\controlador_servidor.py",
             ]
         )
         SERVIDOR.communicate()

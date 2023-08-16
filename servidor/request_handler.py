@@ -40,7 +40,6 @@ class Requesteador(BaseRequestHandler):
 
     def procesar_paquete_del_cliente(self):
         # print("Procesando paquete...")
-        print(self.data_recibida[1])
         logger = Logger()
         logger.log(f"{self.estampa_temporal_de_operacion} --- {self.data_recibida[1]}")
 
