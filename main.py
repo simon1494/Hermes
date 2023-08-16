@@ -4,20 +4,22 @@ sys.path.append("../library")
 
 if __name__ == "__main__":
     import threading
+    import subprocess
+    import os
     from tkinter import Tk
     from clases.logo_inicio import LogoInicio
     from modelo import Modelo
     from vista import Vista
     from clases.controlador import Controlador
     from clases.estructura_base import DB
-    import subprocess
 
     def lanzar_servidor():
         global SERVIDOR
+        ruta_servidor = os.path.dirname(os.path.abspath(__file__))
         SERVIDOR = subprocess.Popen(
             [
                 sys.executable,
-                r"C:\Users\Oficina\Documents\GitHub\library\servidor\controlador_servidor.py",
+                rf"{ruta_servidor}\controlador_servidor.py",
             ]
         )
         SERVIDOR.communicate()
